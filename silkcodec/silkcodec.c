@@ -64,9 +64,8 @@ unsigned long GetHighResolutionTime() /* O: time in usec*/
 /* Seed for the random number generator, which is used for simulating packet loss */
 static SKP_int32 rand_seed = 1;
 
-__declspec(dllexport) int silk_decode( char* inputfile, char* outputfile, int ar )
+SILK_DLL_EXPORT int silk_decode( char* inputfile, char* outputfile, int ar )
 {
-    setlocale(LC_ALL, "");
     unsigned long tottime, starttime;
     double    filetime;
     size_t    counter;
@@ -359,7 +358,7 @@ __declspec(dllexport) int silk_decode( char* inputfile, char* outputfile, int ar
     return SILK_DEC_OK;
 }
 
-__declspec(dllexport) int silk_encode( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
+SILK_DLL_EXPORT int silk_encode( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
                     int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) // they are 0
 {
     unsigned long tottime, starttime;

@@ -1,6 +1,12 @@
 #ifndef SILK_CODEC_H
 #define SILK_CODEC_H
 
+#ifdef _WIN32
+    #define SILK_DLL_EXPORT __declspec(dllexport)
+#else
+    #define SILK_DLL_EXPORT
+#endif
+
 /* Define codec specific settings should be moved to h file */
 #define DEC_MAX_BYTES_PER_FRAME     1024
 #define DEC_MAX_INPUT_FRAMES        5
@@ -15,7 +21,7 @@
 #define SILK_DEC_OUTPUTNOTFOUND 3
 #define SILK_DEC_DECERROR 4
 
-__declspec(dllexport) int silk_decode( char* inputfile, char* outputfile, int ar );
+SILK_DLL_EXPORT int silk_decode( char* inputfile, char* outputfile, int ar );
 
 /* Define codec specific settings */
 #define ENC_MAX_BYTES_PER_FRAME     250 // Equals peak bitrate of 100 kbps 
@@ -36,7 +42,7 @@ __declspec(dllexport) int silk_decode( char* inputfile, char* outputfile, int ar
 //Fs_maxInternal 0
 //packetlength 20
 
-__declspec(dllexport) int silk_encode( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
+SILK_DLL_EXPORT int silk_encode( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
                     int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal); // they are 0
 
 

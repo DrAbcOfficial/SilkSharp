@@ -8,8 +8,6 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 include_directories(interface)
 include_directories(libsilk)
 
-add_library(silkcodec SHARED silkcodec.c)
+aux_source_directory(libsilk SKP_Silk_SDK)
 
-add_subdirectory(libsilk)
-
-target_link_libraries(silkcodec PUBLIC SKP_Silk_SDK)
+add_library(silkcodec SHARED silkcodec.c ${SKP_Silk_SDK})
