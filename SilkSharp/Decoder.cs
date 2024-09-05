@@ -27,7 +27,7 @@ public class Decoder : IDisposable
             using MemoryStream ms = new();
             silkStream.CopyTo(ms);
             IntPtr outdata = 0;
-            UIntPtr size = 0;
+            ulong size = 0;
             var ret = (SilkDecodeResult)NativeCodec.silk_decode(ms.ToArray(), (nuint)ms.Length, ref outdata, ref size, _Fs_API);
             byte[] data = new byte[size];
             Marshal.Copy(outdata, data, 0, data.Length);

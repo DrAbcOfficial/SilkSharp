@@ -51,7 +51,7 @@ public class Encoder : IDisposable
             using MemoryStream ms = new();
             pcm.CopyTo(ms);
             IntPtr outdata = 0;
-            UIntPtr size = 0;
+            ulong size = 0;
             var ret = (SilkEncodeResult)NativeCodec.silk_encode(ms.ToArray(), (nuint)ms.Length, ref outdata, ref size, 
             _Fs_API, _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
             byte[] data = new byte[size];

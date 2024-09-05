@@ -23,7 +23,7 @@
 #define SILK_DEC_NULLINPUTSTREAM 5
 #define SILK_DEC_NULLOUTPUTSTREAM 6
 
-extern SILK_DLL_EXPORT int silk_decode(char* slk, size_t length, char** pcm, size_t* outlen, int ar);
+extern SILK_DLL_EXPORT int silk_decode(char* slk, unsigned long long length, char** pcm, unsigned long long* outlen, int ar);
 extern SILK_DLL_EXPORT int silk_decode_file( char* inputfile, char* outputfile, int ar );
 
 /* Define codec specific settings */
@@ -49,7 +49,7 @@ extern SILK_DLL_EXPORT int silk_decode_file( char* inputfile, char* outputfile, 
 
 extern SILK_DLL_EXPORT int silk_encode_file( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
                     int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal);
-extern SILK_DLL_EXPORT int silk_encode( char* pcm, size_t length, char** slk, size_t* outlen, int Fs_API, int rate, int packetlength, int complecity,
+extern SILK_DLL_EXPORT int silk_encode( char* pcm, unsigned long long length, char** slk, unsigned long long* outlen, int Fs_API, int rate, int packetlength, int complecity,
                     int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal);
 
 #endif //SILK_CODEC_H
