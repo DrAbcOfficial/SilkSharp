@@ -76,11 +76,21 @@ public class Encoder
     /// <param name="pcmpath">Input PCM sound file path</param>
     /// <param name="slkpath">Output Silk v3 sound file path</param>
     /// <exception cref="SilkEncoderException"></exception>
-    public async void EncodeAsync(string pcmpath, string slkpath)
+    public void EncodeAsync(string pcmpath, string slkpath)
+    {
+        EncodeAsync(new FileInfo(pcmpath), new FileInfo(slkpath));
+    }
+    /// <summary>
+    /// Encode PCM sound into Silk v3
+    /// </summary>
+    /// <param name="pcminfo">Input PCM sound file path</param>
+    /// <param name="slkinfo">Output Silk v3 sound file path</param>
+    /// <exception cref="SilkEncoderException"></exception>
+    public async void EncodeAsync(FileInfo pcminfo, FileInfo slkinfo)
     {
         await new TaskFactory().StartNew(() =>
         {
-            var ret = (SilkEncodeResult)NativeCodec.silk_encode_file(pcmpath, slkpath, _Fs_API,
+            var ret = (SilkEncodeResult)NativeCodec.silk_encode_file(pcminfo.FullName, slkinfo.FullName, _Fs_API,
                 _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
             switch(ret)
             {

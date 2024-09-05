@@ -64,11 +64,21 @@ public class Decoder
     /// <param name="slkpath">Input Silk v3 file path</param>
     /// <param name="pcmpath">Output PCM file path</param>
     /// <exception cref="SilkDecoderException"></exception>
-    public async void DecodeAsync(string slkpath, string pcmpath)
+    public void Decode(string slkpath, string pcmpath)
+    {
+        DecodeAsync(new FileInfo(slkpath), new FileInfo(pcmpath));
+    }
+    /// <summary>
+    /// Decode Silk v3 speech into PCM
+    /// </summary>
+    /// <param name="slkpath">Input Silk v3 file path</param>
+    /// <param name="pcmpath">Output PCM file path</param>
+    /// <exception cref="SilkDecoderException"></exception>
+    public async void DecodeAsync(FileInfo slkpath, FileInfo pcmpath)
     {
         await new TaskFactory().StartNew(() =>
         {
-            var ret = (SilkDecodeResult)NativeCodec.silk_decode_file(slkpath, pcmpath, _Fs_API, _loss);
+            var ret = (SilkDecodeResult)NativeCodec.silk_decode_file(slkpath.FullName, pcmpath.FullName, _Fs_API, _loss);
             switch(ret)
             {
                 case SilkDecodeResult.NULL_INPUT_STREAM:

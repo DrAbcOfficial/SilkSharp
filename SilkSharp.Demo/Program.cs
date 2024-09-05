@@ -2,25 +2,23 @@
 
 internal class Program
 {
-    static void Main(string[] args)
+    static async void Test()
     {
-        using Encoder encoder = new();
+        Encoder encoder = new();
         Console.WriteLine("File Encode");
-        var fe = encoder.EncodeAsync("./rasputin.pcm", "./rasputin.silk");
-        fe.Wait();
+        encoder.EncodeAsync("./rasputin.pcm", "./rasputin.silk");
         Console.WriteLine("Stream Encode");
         using FileStream fse = File.OpenRead("./rasputin.pcm");
-        using MemoryStream mse = new();
-        var se = encoder.EncodeAsync(fse, mse);
-        se.Wait();
-        using Decoder decoder = new();
+        using MemoryStream mse = new(await encoder.EncodeAsync(fse));
+        Decoder decoder = new();
         Console.WriteLine("File Decode");
-        var fd = encoder.EncodeAsync("./badmoonarising.silk", "./badmoonarising.pcm");
-        fd.Wait();
+        encoder.EncodeAsync("./badmoonrising.silk", "./badmoonrising.pcm");
         Console.WriteLine("Stream Decode");
-        using FileStream fsd = File.OpenRead("./badmoonarising.silk");
-        using MemoryStream msd = new();
-        var sd = encoder.EncodeAsync(fsd, msd);
-        sd.Wait();
+        using FileStream fsd = File.OpenRead("./badmoonrising.silk");
+        using MemoryStream msd = new(await encoder.EncodeAsync(fsd));
+    }
+    static void Main(string[] args)
+    {
+        Test();
     }
 }
