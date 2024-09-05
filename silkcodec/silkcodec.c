@@ -84,7 +84,7 @@ FILE *fmemopen(void *buf, size_t len, const char *type)
 	rewind(fp);
 	return fp;
 }
-FILE* fopen_memstream(char** buf, unsigned long long* size) {
+FILE* open_memstream(char** buf, SKP_uint64* size) {
     FILE* f = tmpfile();
     if (!f) 
         return NULL;
@@ -387,14 +387,14 @@ int silk_decode_internal(FILE* bitInFile, FILE* speechOutFile, int ar)
     return SILK_DEC_OK;
 }
 
-SILK_DLL_EXPORT int silk_decode(char* slk, unsigned long long length, char** pcm, unsigned long long* outlen, int ar)
+SILK_DLL_EXPORT int silk_decode(char* slk, SKP_uint64 length, char** pcm, SKP_uint64* outlen, int ar)
 {
     FILE *inputstream = fmemopen(slk, length, "rb");
     if (inputstream == NULL)
         return SILK_DEC_NULLINPUTSTREAM;
     char* outbuf;
-    unsigned long long size = 0;
-    FILE *outputstream = fopen_memstream(&outbuf, &size);
+    SKP_uint64 size = 0;
+    FILE *outputstream = open_memstream(&outbuf, &size);
     if (outputstream == NULL)
         return SILK_DEC_NULLOUTPUTSTREAM;
     int ret = silk_decode_internal(inputstream, outputstream, ar);
@@ -408,8 +408,6 @@ SILK_DLL_EXPORT int silk_decode(char* slk, unsigned long long length, char** pcm
 
     *pcm = outbuf;
     *outlen = size;
-
-
     /* Close files */
     fclose( outputstream );
     fclose( inputstream );
@@ -605,7 +603,7 @@ SILK_DLL_EXPORT int silk_encode_file( char* inputfile, char* outputfile, int Fs_
     return ret;
 }
 
-SILK_DLL_EXPORT int silk_encode( char* pcm, unsigned long long length, char** slk, unsigned long long* outlen, int Fs_API, int rate, int packetlength, int complecity,
+SILK_DLL_EXPORT int silk_encode( char* pcm, SKP_uint64 length, char** slk, SKP_uint64* outlen, int Fs_API, int rate, int packetlength, int complecity,
                     int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) 
 {
     FILE *speechInFile = fmemopen(pcm, length, "rb");
@@ -613,8 +611,8 @@ SILK_DLL_EXPORT int silk_encode( char* pcm, unsigned long long length, char** sl
         return SILK_ENC_NULLINPUTSTREAM;
 
     char* outbuf;
-    unsigned long long size = 0;
-    FILE *bitOutFile = fopen_memstream(&outbuf, &size);
+    SKP_uint64 size = 0;
+    FILE *bitOutFile = open_memstream(&outbuf, &size);
     if (bitOutFile == NULL)
         return SILK_ENC_NULLOUTPUTSTREAM;
     int ret = silk_encode_internal(speechInFile, bitOutFile, Fs_API, rate, packetlength, complecity, intencent, loss, dtx, inbandfec, Fs_maxInternal);
