@@ -33,14 +33,16 @@ void swap_endian(
 
 #if (defined(_WIN32) || defined(_WINCE))
 #include <windows.h>	/* timer */
-#include <locale.h>
+#include <share.h>
+#include <io.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #else    // Linux or Mac
 #include <sys/time.h>
 #endif
 
 #ifdef _WIN32
-
 unsigned long GetHighResolutionTime() /* O: time in usec*/
 {
     /* Returns a time counter in microsec	*/
@@ -51,6 +53,45 @@ unsigned long GetHighResolutionTime() /* O: time in usec*/
     QueryPerformanceCounter(&lpPerformanceCount);
     QueryPerformanceFrequency(&lpFrequency);
     return (unsigned long)((1000000*(lpPerformanceCount.QuadPart)) / lpFrequency.QuadPart);
+}
+/* https://github.com/Arryboom/fmemopen_windows  */
+//fmemeopen
+FILE *fmemopen(void *buf, size_t len, const char *type)
+{
+	int fd;
+	FILE *fp;
+	char tp[MAX_PATH - 13];
+	char fn[MAX_PATH + 1];
+	int * pfd = &fd;
+	int retner = -1;
+	char tfname[] = "MemTF_";
+	if (!GetTempPathA(sizeof(tp), tp))
+		return NULL;
+	if (!GetTempFileNameA(tp, tfname, 0, fn))
+		return NULL;
+	retner = _sopen_s(pfd, fn, _O_CREAT | _O_SHORT_LIVED | _O_TEMPORARY | _O_RDWR | _O_BINARY | _O_NOINHERIT, _SH_DENYRW, _S_IREAD | _S_IWRITE);
+	if (retner != 0)
+		return NULL;
+	if (fd == -1)
+		return NULL;
+	fp = _fdopen(fd, "wb+");
+	if (!fp) {
+		_close(fd);
+		return NULL;
+	}
+	/*File descriptors passed into _fdopen are owned by the returned FILE * stream.If _fdopen is successful, do not call _close on the file descriptor.Calling fclose on the returned FILE * also closes the file descriptor.*/
+	fwrite(buf, len, 1, fp);
+	rewind(fp);
+	return fp;
+}
+FILE* fopen_memstream(char** buf, size_t* size) {
+    FILE* f = tmpfile();
+    if (!f) 
+        return NULL;
+
+    *buf = NULL;
+    *size = 0;
+    return f;
 }
 #else    // Linux or Mac
 unsigned long GetHighResolutionTime() /* O: time in usec*/
@@ -64,7 +105,7 @@ unsigned long GetHighResolutionTime() /* O: time in usec*/
 /* Seed for the random number generator, which is used for simulating packet loss */
 static SKP_int32 rand_seed = 1;
 
-SILK_DLL_EXPORT int silk_decode( char* inputfile, char* outputfile, int ar )
+int silk_decode_internal(FILE* bitInFile, FILE* speechOutFile, int ar)
 {
     unsigned long tottime, starttime;
     double    filetime;
@@ -78,7 +119,6 @@ SILK_DLL_EXPORT int silk_decode( char* inputfile, char* outputfile, int ar )
     SKP_int16 nBytesFEC;
     SKP_int16 nBytesPerPacket[ DEC_MAX_LBRR_DELAY + 1 ], totBytes;
     SKP_int16 out[ ( ( DEC_FRAME_LENGTH_MS * DEC_MAX_API_FS_KHZ ) << 1 ) * DEC_MAX_INPUT_FRAMES ], *outPtr;
-    FILE      *bitInFile, *speechOutFile;
     SKP_int32 packetSize_ms=0, API_Fs_Hz = ar;
     SKP_int32 decSizeBytes;
     void      *psDec;
@@ -89,11 +129,7 @@ SILK_DLL_EXPORT int silk_decode( char* inputfile, char* outputfile, int ar )
     /* default settings */
     loss_prob = 0.0f;
 
-    /* Open files */
-    bitInFile = fopen( inputfile, "rb" );
-    if( bitInFile == NULL )
-        return SILK_DEC_FILENOTFOUND;
-
+   
     /* Check Silk header */
     {
         char header_buf[ 50 ];
@@ -115,10 +151,6 @@ SILK_DLL_EXPORT int silk_decode( char* inputfile, char* outputfile, int ar )
            }
         }
     }
-
-    speechOutFile = fopen( outputfile, "wb" );
-    if( speechOutFile == NULL )
-        return SILK_DEC_OUTPUTNOTFOUND;
 
     /* Set the samplingrate that is requested for the output */
     if( API_Fs_Hz == 0 ) {
@@ -351,14 +383,56 @@ SILK_DLL_EXPORT int silk_decode( char* inputfile, char* outputfile, int ar )
 
     /* Free decoder */
     free( psDec );
-    /* Close files */
-    fclose( speechOutFile );
-    fclose( bitInFile );
     filetime = totPackets * 1e-3 * packetSize_ms;
     return SILK_DEC_OK;
 }
 
-SILK_DLL_EXPORT int silk_encode( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
+SILK_DLL_EXPORT int silk_decode(char* slk, size_t length, char** pcm, size_t* outlen, int ar)
+{
+    FILE *inputstream = fmemopen(slk, length, "rb");
+    if (inputstream == NULL)
+        return SILK_DEC_NULLINPUTSTREAM;
+    char* outbuf;
+    size_t size = 0;
+    FILE *outputstream = fopen_memstream(&outbuf, &size);
+    if (outputstream == NULL)
+        return SILK_DEC_NULLOUTPUTSTREAM;
+    int ret = silk_decode_internal(inputstream, outputstream, ar);
+
+#ifdef WIN32
+    fseek(outputstream, 0, SEEK_END);
+    size = ftell(outputstream); 
+    outbuf = (char*)malloc(size + 1);
+    fread(outbuf, 1, size, outputstream);
+#endif
+
+    *pcm = outbuf;
+    *outlen = size;
+
+
+    /* Close files */
+    fclose( outputstream );
+    fclose( inputstream );
+    return ret;
+}
+SILK_DLL_EXPORT int silk_decode_file( char* inputfile, char* outputfile, int ar )
+{
+     /* Open files */
+    FILE* bitInFile = fopen( inputfile, "rb" );
+    if( bitInFile == NULL )
+        return SILK_DEC_FILENOTFOUND;
+    FILE* speechOutFile = fopen( outputfile, "wb" );
+    if( speechOutFile == NULL )
+        return SILK_DEC_OUTPUTNOTFOUND;
+
+    int ret =  silk_decode_internal(bitInFile, speechOutFile, ar);
+    /* Close files */
+    fclose( speechOutFile );
+    fclose( bitInFile );
+    return ret;
+}
+
+int silk_encode_internal( FILE* speechInFile, FILE* bitOutFile, int Fs_API, int rate, int packetlength, int complecity,
                     int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) // they are 0
 {
     unsigned long tottime, starttime;
@@ -369,7 +443,6 @@ SILK_DLL_EXPORT int silk_encode( char* inputfile, char* outputfile, int Fs_API, 
     double    sumBytes, sumActBytes, avg_rate, act_rate, nrg;
     SKP_uint8 payload[ ENC_MAX_BYTES_PER_FRAME * ENC_MAX_INPUT_FRAMES ];
     SKP_int16 in[ ENC_FRAME_LENGTH_MS * ENC_MAX_API_FS_KHZ * ENC_MAX_INPUT_FRAMES ];
-    FILE      *bitOutFile, *speechInFile;
     SKP_int32 encSizeBytes;
     void      *psEnc;
 #ifdef _SYSTEM_IS_BIG_ENDIAN
@@ -399,18 +472,11 @@ SILK_DLL_EXPORT int silk_encode( char* inputfile, char* outputfile, int Fs_API, 
             max_internal_fs_Hz = API_fs_Hz;
         }
     }
-
-
-    /* Open files */
-    speechInFile = fopen( inputfile, "rb" );
-    if( speechInFile == NULL ) 
-        return SILK_ENC_INPUTNOTFOUND;
-    bitOutFile = fopen( outputfile, "wb" );
-    if( bitOutFile == NULL ) 
-        return SILK_ENC_OUTPUTNOTFOUND;
+    
     /* Add Silk header to stream */
     {
-        if( tencent ) {
+        if( tencent ) 
+        {
 	        static const char Tencent_break[] = "";
             fwrite( Tencent_break, sizeof( char ), strlen( Tencent_break ), bitOutFile );
         }
@@ -517,11 +583,52 @@ SILK_DLL_EXPORT int silk_encode( char* inputfile, char* outputfile, int Fs_API, 
     /* Free Encoder */
     free( psEnc );
 
-    fclose( speechInFile );
-    fclose( bitOutFile );
-
-    filetime  = totPackets * 1e-3 * packetSize_ms;
-    avg_rate  = 8.0 / packetSize_ms * sumBytes       / totPackets;
-    act_rate  = 8.0 / packetSize_ms * sumActBytes    / totActPackets;
+    fflush( speechInFile );
     return SILK_ENC_OK;
+}
+
+
+SILK_DLL_EXPORT int silk_encode_file( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
+                    int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) 
+{
+    /* Open files */
+    FILE* speechInFile = fopen( inputfile, "rb" );
+    if( speechInFile == NULL ) 
+        return SILK_ENC_INPUTNOTFOUND;
+    FILE* bitOutFile = fopen( outputfile, "wb" );
+    if( bitOutFile == NULL ) 
+        return SILK_ENC_OUTPUTNOTFOUND;
+
+    int ret = silk_encode_internal(speechInFile, bitOutFile, Fs_API, rate, packetlength, complecity, intencent, loss, dtx, inbandfec, Fs_maxInternal);
+    fclose( bitOutFile );
+    fclose( speechInFile );
+    return ret;
+}
+
+SILK_DLL_EXPORT int silk_encode( char* pcm, size_t length, char** slk, size_t* outlen, int Fs_API, int rate, int packetlength, int complecity,
+                    int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) 
+{
+    FILE *speechInFile = fmemopen(pcm, length, "rb");
+    if (speechInFile == NULL)
+        return SILK_ENC_NULLINPUTSTREAM;
+
+    char* outbuf;
+    size_t size = 0;
+    FILE *bitOutFile = fopen_memstream(&outbuf, &size);
+    if (bitOutFile == NULL)
+        return SILK_ENC_NULLOUTPUTSTREAM;
+    int ret = silk_encode_internal(speechInFile, bitOutFile, Fs_API, rate, packetlength, complecity, intencent, loss, dtx, inbandfec, Fs_maxInternal);
+
+#ifdef WIN32
+    fseek(bitOutFile, 0, SEEK_END);
+    size = ftell(bitOutFile); 
+    outbuf = (char*)malloc(size + 1);
+    fread(outbuf, 1, size, bitOutFile);
+#endif
+    
+    *slk = outbuf;
+    *outlen = size;
+    fclose( bitOutFile );
+    fclose( speechInFile );
+    return ret;
 }
