@@ -1,4 +1,5 @@
-﻿using SilkSharp.Exception;
+﻿using SilkSharp.SilkException;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace SilkSharp;
@@ -76,9 +77,9 @@ public class Encoder
     /// <param name="pcmpath">Input PCM sound file path</param>
     /// <param name="slkpath">Output Silk v3 sound file path</param>
     /// <exception cref="SilkEncoderException"></exception>
-    public void EncodeAsync(string pcmpath, string slkpath)
+    public void Encode(string pcmpath, string slkpath)
     {
-        EncodeAsync(new FileInfo(pcmpath), new FileInfo(slkpath));
+        Encode(new FileInfo(pcmpath), new FileInfo(slkpath));
     }
     /// <summary>
     /// Encode PCM sound into Silk v3
@@ -86,23 +87,72 @@ public class Encoder
     /// <param name="pcminfo">Input PCM sound file path</param>
     /// <param name="slkinfo">Output Silk v3 sound file path</param>
     /// <exception cref="SilkEncoderException"></exception>
-    public async void EncodeAsync(FileInfo pcminfo, FileInfo slkinfo)
+    public void Encode(FileInfo pcminfo, FileInfo slkinfo)
     {
-        await new TaskFactory().StartNew(() =>
+        var ret = (SilkEncodeResult)NativeCodec.silk_encode_file(pcminfo.FullName, slkinfo.FullName, _Fs_API,
+                 _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
+        switch (ret)
         {
-            var ret = (SilkEncodeResult)NativeCodec.silk_encode_file(pcminfo.FullName, slkinfo.FullName, _Fs_API,
-                _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
-            switch(ret)
-            {
-                case SilkEncodeResult.NULL_INPUT_STREAM:
-                case SilkEncodeResult.INPUT_NOT_FOUND: throw new SilkEncoderException("Input file is null", ret);
-                case SilkEncodeResult.NULL_OUTPUT_STREAM:
-                case SilkEncodeResult.OUTPUT_NOT_FOUND: throw new SilkEncoderException("Output file is null", ret);
-                case SilkEncodeResult.CREATE_ECODER_ERROR: throw new SilkEncoderException("Can not create Silk Encoder", ret);
-                case SilkEncodeResult.RESET_ECODER_ERROR: throw new SilkEncoderException("Can not reset Silk Encoder", ret);
-                case SilkEncodeResult.SAMPLE_RATE_OUT_OF_RANGE: throw new SilkEncoderException($"API Sampling rate = {_rate} out of range, valid range 8000 - 48000", ret);
-            }
-        });
+            case SilkEncodeResult.NULL_INPUT_STREAM:
+            case SilkEncodeResult.INPUT_NOT_FOUND: throw new SilkEncoderException("Input file is null", ret);
+            case SilkEncodeResult.NULL_OUTPUT_STREAM:
+            case SilkEncodeResult.OUTPUT_NOT_FOUND: throw new SilkEncoderException("Output file is null", ret);
+            case SilkEncodeResult.CREATE_ECODER_ERROR: throw new SilkEncoderException("Can not create Silk Encoder", ret);
+            case SilkEncodeResult.RESET_ECODER_ERROR: throw new SilkEncoderException("Can not reset Silk Encoder", ret);
+            case SilkEncodeResult.SAMPLE_RATE_OUT_OF_RANGE: throw new SilkEncoderException($"API Sampling rate = {_rate} out of range, valid range 8000 - 48000", ret);
+        }
+    }
+    /// <summary>
+    /// Encode PCM sound into Silk v3
+    /// </summary>
+    /// <param name="pcm">Input PCM sound stream</param>
+    /// <returns>Silk v3 file data</returns>
+    /// <exception cref="SilkEncoderException"></exception>
+    public byte[] Encode(Stream pcm)
+    {
+        byte[] bytes = new byte[pcm.Length];
+        pcm.Read(bytes);
+        nint outdata = 0;
+        ulong size = 0;
+        var ret = (SilkEncodeResult)NativeCodec.silk_encode(bytes, (ulong)bytes.Length, ref outdata, ref size,
+            _Fs_API, _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
+        if (ret != SilkEncodeResult.OK && outdata != 0)
+            Marshal.FreeHGlobal(outdata);
+        switch (ret)
+        {
+            case SilkEncodeResult.NULL_INPUT_STREAM:
+            case SilkEncodeResult.INPUT_NOT_FOUND: throw new SilkEncoderException("Input stream is null", ret);
+            case SilkEncodeResult.NULL_OUTPUT_STREAM:
+            case SilkEncodeResult.OUTPUT_NOT_FOUND: throw new SilkEncoderException("Output stream is null", ret);
+            case SilkEncodeResult.CREATE_ECODER_ERROR: throw new SilkEncoderException("Can not create Silk Encoder", ret);
+            case SilkEncodeResult.RESET_ECODER_ERROR: throw new SilkEncoderException("Can not reset Silk Encoder", ret);
+            case SilkEncodeResult.SAMPLE_RATE_OUT_OF_RANGE: throw new SilkEncoderException($"API Sampling rate = {_rate} out of range, valid range 8000 - 48000", ret);
+        }
+        byte[] data = new byte[size];
+        Marshal.Copy(outdata, data, 0, data.Length);
+        Marshal.FreeHGlobal(outdata);
+        return data;
+    }
+
+    /// <summary>
+    /// Encode PCM sound into Silk v3
+    /// </summary>
+    /// <param name="pcmpath">Input PCM sound file path</param>
+    /// <param name="slkpath">Output Silk v3 sound file path</param>
+    /// <exception cref="SilkEncoderException"></exception>
+    public async Task EncodeAsync(string slkpath, string pcmpath)
+    {
+        await Task.Run(() => Encode(slkpath, pcmpath));
+    }
+    /// <summary>
+    /// Encode PCM sound into Silk v3
+    /// </summary>
+    /// <param name="pcminfo">Input PCM sound file path</param>
+    /// <param name="slkinfo">Output Silk v3 sound file path</param>
+    /// <exception cref="SilkEncoderException"></exception>
+    public async Task EncodeAsync(FileInfo slkpath, FileInfo pcmpath)
+    {
+        await Task.Run(() => Encode(slkpath, pcmpath));
     }
     /// <summary>
     /// Encode PCM sound into Silk v3
@@ -112,32 +162,27 @@ public class Encoder
     /// <exception cref="SilkEncoderException"></exception>
     public async Task<byte[]> EncodeAsync(Stream pcm)
     {
-        return await new TaskFactory().StartNew(() =>
-        {
-            using MemoryStream ms = new();
-            pcm.CopyTo(ms);
-            IntPtr outdata = 0;
-            ulong size = 0;
-            var ret = (SilkEncodeResult)NativeCodec.silk_encode(ms.ToArray(), (nuint)ms.Length, ref outdata, ref size, 
-                _Fs_API, _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
-            if(ret != SilkEncodeResult.OK && outdata != 0)
-                Marshal.FreeHGlobal(outdata);
-            switch(ret)
-            {
-                case SilkEncodeResult.NULL_INPUT_STREAM:
-                case SilkEncodeResult.INPUT_NOT_FOUND: throw new SilkEncoderException("Input stream is null", ret);
-                case SilkEncodeResult.NULL_OUTPUT_STREAM:
-                case SilkEncodeResult.OUTPUT_NOT_FOUND: throw new SilkEncoderException("Output stream is null", ret);
-                case SilkEncodeResult.CREATE_ECODER_ERROR: throw new SilkEncoderException("Can not create Silk Encoder", ret);
-                case SilkEncodeResult.RESET_ECODER_ERROR: throw new SilkEncoderException("Can not reset Silk Encoder", ret);
-                case SilkEncodeResult.SAMPLE_RATE_OUT_OF_RANGE: throw new SilkEncoderException($"API Sampling rate = {_rate} out of range, valid range 8000 - 48000", ret);
-            }
-            byte[] data = new byte[size];
-            Marshal.Copy(outdata, data, 0, data.Length);
+        byte[] bytes = new byte[pcm.Length];
+        await pcm.ReadAsync(bytes);
+        nint outdata = 0;
+        ulong size = 0;
+        var ret = (SilkEncodeResult)NativeCodec.silk_encode(bytes, (ulong)bytes.Length, ref outdata, ref size,
+            _Fs_API, _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
+        if (ret != SilkEncodeResult.OK && outdata != 0)
             Marshal.FreeHGlobal(outdata);
-            ms.Close();
-            ms.Dispose();
-            return data;
-        });
+        switch (ret)
+        {
+            case SilkEncodeResult.NULL_INPUT_STREAM:
+            case SilkEncodeResult.INPUT_NOT_FOUND: throw new SilkEncoderException("Input stream is null", ret);
+            case SilkEncodeResult.NULL_OUTPUT_STREAM:
+            case SilkEncodeResult.OUTPUT_NOT_FOUND: throw new SilkEncoderException("Output stream is null", ret);
+            case SilkEncodeResult.CREATE_ECODER_ERROR: throw new SilkEncoderException("Can not create Silk Encoder", ret);
+            case SilkEncodeResult.RESET_ECODER_ERROR: throw new SilkEncoderException("Can not reset Silk Encoder", ret);
+            case SilkEncodeResult.SAMPLE_RATE_OUT_OF_RANGE: throw new SilkEncoderException($"API Sampling rate = {_rate} out of range, valid range 8000 - 48000", ret);
+        }
+        byte[] data = new byte[size];
+        Marshal.Copy(outdata, data, 0, data.Length);
+        Marshal.FreeHGlobal(outdata);
+        return data;
     }
 }
