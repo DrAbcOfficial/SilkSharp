@@ -25,8 +25,8 @@
 #define SILK_DEC_NULLINPUTSTREAM 5
 #define SILK_DEC_NULLOUTPUTSTREAM 6
 
-extern SILK_DLL_EXPORT int silk_decode(char* slk, SKP_uint64 length, char** pcm, SKP_uint64* outlen, int ar);
-extern SILK_DLL_EXPORT int silk_decode_file( char* inputfile, char* outputfile, int ar );
+extern SILK_DLL_EXPORT SKP_int32 silk_decode(char* slk, SKP_uint64 length, char** pcm, SKP_uint64* outlen, SKP_int32 ar, SKP_float loss);
+extern SILK_DLL_EXPORT SKP_int32 silk_decode_file( char* inputfile, char* outputfile, SKP_int32 ar, SKP_float loss);
 
 /* Define codec specific settings */
 #define ENC_MAX_BYTES_PER_FRAME     250 // Equals peak bitrate of 100 kbps 
@@ -43,15 +43,9 @@ extern SILK_DLL_EXPORT int silk_decode_file( char* inputfile, char* outputfile, 
 #define SILK_ENC_NULLINPUTSTREAM 6
 #define SILK_ENC_NULLOUTPUTSTREAM 7
 
-//Fs_API 24000
-//rate 25000
-//complecity if LOW_COMPLEXITY_ONLY 0 else 2
-//Fs_maxInternal 0
-//packetlength 20
-
-extern SILK_DLL_EXPORT int silk_encode_file( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
-                    int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal);
-extern SILK_DLL_EXPORT int silk_encode( char* pcm, SKP_uint64 length, char** slk, SKP_uint64* outlen, int Fs_API, int rate, int packetlength, int complecity,
-                    int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal);
+extern SILK_DLL_EXPORT SKP_int32 silk_encode_file( char* inputfile, char* outputfile, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
+                    SKP_int32 intencent, SKP_int32 loss, SKP_int32 dtx, SKP_int32 inbandfec, SKP_int32 Fs_maxInternal);
+extern SILK_DLL_EXPORT SKP_int32 silk_encode( char* pcm, SKP_uint64 length, char** slk, SKP_uint64* outlen, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
+                    SKP_int32 intencent, SKP_int32 loss, SKP_int32 dtx, SKP_int32 inbandfec, SKP_int32 Fs_maxInternal);
 
 #endif //SILK_CODEC_H

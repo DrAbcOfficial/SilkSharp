@@ -105,7 +105,7 @@ unsigned long GetHighResolutionTime() /* O: time in usec*/
 /* Seed for the random number generator, which is used for simulating packet loss */
 static SKP_int32 rand_seed = 1;
 
-int silk_decode_internal(FILE* bitInFile, FILE* speechOutFile, int ar)
+SKP_int32 silk_decode_internal(FILE* bitInFile, FILE* speechOutFile, SKP_int32 ar, SKP_float loss)
 {
     unsigned long tottime, starttime;
     double    filetime;
@@ -126,8 +126,7 @@ int silk_decode_internal(FILE* bitInFile, FILE* speechOutFile, int ar)
     SKP_int32 frames, lost;
     SKP_SILK_SDK_DecControlStruct DecControl;
 
-    /* default settings */
-    loss_prob = 0.0f;
+    loss_prob = loss;
 
    
     /* Check Silk header */
@@ -387,7 +386,7 @@ int silk_decode_internal(FILE* bitInFile, FILE* speechOutFile, int ar)
     return SILK_DEC_OK;
 }
 
-SILK_DLL_EXPORT int silk_decode(char* slk, SKP_uint64 length, char** pcm, SKP_uint64* outlen, int ar)
+SILK_DLL_EXPORT SKP_int32 silk_decode(char* slk, SKP_uint64 length, char** pcm, SKP_uint64* outlen, SKP_int32 ar, SKP_float loss)
 {
     FILE *inputstream = fmemopen(slk, length, "rb");
     if (inputstream == NULL)
@@ -397,7 +396,7 @@ SILK_DLL_EXPORT int silk_decode(char* slk, SKP_uint64 length, char** pcm, SKP_ui
     FILE *outputstream = open_memstream(&outbuf, &size);
     if (outputstream == NULL)
         return SILK_DEC_NULLOUTPUTSTREAM;
-    int ret = silk_decode_internal(inputstream, outputstream, ar);
+    int ret = silk_decode_internal(inputstream, outputstream, ar, loss);
 
 #ifdef WIN32
     fseek(outputstream, 0, SEEK_END);
@@ -413,7 +412,7 @@ SILK_DLL_EXPORT int silk_decode(char* slk, SKP_uint64 length, char** pcm, SKP_ui
     fclose( inputstream );
     return ret;
 }
-SILK_DLL_EXPORT int silk_decode_file( char* inputfile, char* outputfile, int ar )
+SILK_DLL_EXPORT SKP_int32 silk_decode_file( char* inputfile, char* outputfile, SKP_int32 ar, SKP_float loss)
 {
      /* Open files */
     FILE* bitInFile = fopen( inputfile, "rb" );
@@ -423,15 +422,15 @@ SILK_DLL_EXPORT int silk_decode_file( char* inputfile, char* outputfile, int ar 
     if( speechOutFile == NULL )
         return SILK_DEC_OUTPUTNOTFOUND;
 
-    int ret =  silk_decode_internal(bitInFile, speechOutFile, ar);
+    int ret =  silk_decode_internal(bitInFile, speechOutFile, ar, loss);
     /* Close files */
     fclose( speechOutFile );
     fclose( bitInFile );
     return ret;
 }
 
-int silk_encode_internal( FILE* speechInFile, FILE* bitOutFile, int Fs_API, int rate, int packetlength, int complecity,
-                    int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) // they are 0
+SKP_int32 silk_encode_internal( FILE* speechInFile, FILE* bitOutFile, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
+                    SKP_int32 intencent, SKP_int32 loss, SKP_int32 dtx, SKP_int32 inbandfec, SKP_int32 Fs_maxInternal)
 {
     unsigned long tottime, starttime;
     double    filetime;
@@ -586,8 +585,8 @@ int silk_encode_internal( FILE* speechInFile, FILE* bitOutFile, int Fs_API, int 
 }
 
 
-SILK_DLL_EXPORT int silk_encode_file( char* inputfile, char* outputfile, int Fs_API, int rate, int packetlength, int complecity,
-                    int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) 
+SILK_DLL_EXPORT SKP_int32 silk_encode_file( char* inputfile, char* outputfile, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
+                    SKP_int32 intencent, SKP_int32 loss, SKP_int32 dtx, SKP_int32 inbandfec, SKP_int32 Fs_maxInternal) 
 {
     /* Open files */
     FILE* speechInFile = fopen( inputfile, "rb" );
@@ -603,8 +602,8 @@ SILK_DLL_EXPORT int silk_encode_file( char* inputfile, char* outputfile, int Fs_
     return ret;
 }
 
-SILK_DLL_EXPORT int silk_encode( char* pcm, SKP_uint64 length, char** slk, SKP_uint64* outlen, int Fs_API, int rate, int packetlength, int complecity,
-                    int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal) 
+SILK_DLL_EXPORT SKP_int32 silk_encode( char* pcm, SKP_uint64 length, char** slk, SKP_uint64* outlen, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
+                    SKP_int32 intencent, SKP_int32 loss, SKP_int32 dtx, SKP_int32 inbandfec, SKP_int32 Fs_maxInternal) 
 {
     FILE *speechInFile = fmemopen(pcm, length, "rb");
     if (speechInFile == NULL)
