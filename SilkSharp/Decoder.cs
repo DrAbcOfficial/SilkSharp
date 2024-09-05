@@ -3,16 +3,43 @@ using System.Runtime.InteropServices;
 
 namespace SilkSharp;
 
+/// <summary>
+/// Silk v3 speech to PCM decoder
+/// </summary>
 public class Decoder
 {
+    /// <summary>
+    /// Decode result, from native lib
+    /// </summary>
     public enum SilkDecodeResult
     {
+        /// <summary>
+        /// OK
+        /// </summary>
         OK = 0,
+        /// <summary>
+        /// Can not found input file
+        /// </summary>
         INPUT_NOT_FOUND,
+        /// <summary>
+        /// Header is not valid silk v3 file
+        /// </summary>
         WRONG_HEADER,
+        /// <summary>
+        /// Cant not found output file
+        /// </summary>
         OUTPUT_NOT_FOUND,
+        /// <summary>
+        /// Decoded with error
+        /// </summary>
         DECODE_ERROR,
+        /// <summary>
+        /// Input stream is null
+        /// </summary>
         NULL_INPUT_STREAM,
+        /// <summary>
+        /// Output stream is null
+        /// </summary>
         NULL_OUTPUT_STREAM
     }
     /// <summary>

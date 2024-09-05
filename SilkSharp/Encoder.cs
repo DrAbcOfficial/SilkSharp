@@ -1,27 +1,68 @@
 ﻿using SilkSharp.SilkException;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace SilkSharp;
 
+/// <summary>
+///  s16le PCM to Silk v3 Encoder
+/// </summary>
 public class Encoder
 {
+    /// <summary>
+    /// Encode result, from native lib
+    /// </summary>
     public enum SilkEncodeResult
     {
+        /// <summary>
+        /// OK
+        /// </summary>
         OK = 0,
+        /// <summary>
+        /// Can not found input file
+        /// </summary>
         INPUT_NOT_FOUND,
+        /// <summary>
+        /// Can not found output file
+        /// </summary>
         OUTPUT_NOT_FOUND,
+        /// <summary>
+        /// Can not create encoder
+        /// </summary>
         CREATE_ECODER_ERROR,
+        /// <summary>
+        /// Can not init encoder
+        /// </summary>
         RESET_ECODER_ERROR,
+        /// <summary>
+        /// FS_API sampling out of range, valid range 8000 - 48000
+        /// </summary>
         SAMPLE_RATE_OUT_OF_RANGE,
+        /// <summary>
+        /// Input stream is null
+        /// </summary>
         NULL_INPUT_STREAM,
+        /// <summary>
+        /// Output stream is null
+        /// </summary>
         NULL_OUTPUT_STREAM
     }
+    /// <summary>
+    /// Silk file complecity
+    /// </summary>
     public enum SilkComplecity
     {
+        /// <summary>
+        /// Low quality, min size
+        /// </summary>
         Low = 0,
+        /// <summary>
+        /// Medium quality, ave size
+        /// </summary>
         Medium = 1,
-        Hight = 2
+        /// <summary>
+        /// High quality, large size
+        /// </summary>
+        High = 2
     }
 
     /// <summary>
@@ -154,9 +195,9 @@ public class Encoder
     /// <param name="pcminfo">Input PCM sound file path</param>
     /// <param name="slkinfo">Output Silk v3 sound file path</param>
     /// <exception cref="SilkEncoderException"></exception>
-    public async Task EncodeAsync(FileInfo slkpath, FileInfo pcmpath)
+    public async Task EncodeAsync(FileInfo pcminfo, FileInfo slkinfo)
     {
-        await Task.Run(() => Encode(slkpath, pcmpath));
+        await Task.Run(() => Encode(pcminfo, slkinfo));
     }
     /// <summary>
     /// Encode PCM sound into Silk v3
