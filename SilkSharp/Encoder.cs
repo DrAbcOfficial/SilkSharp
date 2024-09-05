@@ -110,8 +110,12 @@ public class Encoder
     /// <exception cref="SilkEncoderException"></exception>
     public byte[] Encode(Stream pcm)
     {
+        if (pcm == null || !pcm.CanRead)
+            throw new SilkEncoderException("Input stream is null or not readable", SilkEncodeResult.NULL_INPUT_STREAM);
         byte[] bytes = new byte[pcm.Length];
-        pcm.Read(bytes);
+        int bytesRead = pcm.Read(bytes);
+        if (bytesRead != bytes.Length)
+            throw new SilkEncoderException("Failed to read the entire stream", SilkEncodeResult.NULL_INPUT_STREAM);
         nint outdata = 0;
         ulong size = 0;
         var ret = (SilkEncodeResult)NativeCodec.silk_encode(bytes, (ulong)bytes.Length, ref outdata, ref size,
@@ -160,29 +164,8 @@ public class Encoder
     /// <param name="pcm">Input PCM sound stream</param>
     /// <returns>Silk v3 file data</returns>
     /// <exception cref="SilkEncoderException"></exception>
-    public async Task<byte[]> EncodeAsync(Stream pcm)
+    public Task<byte[]> EncodeAsync(Stream pcm)
     {
-        byte[] bytes = new byte[pcm.Length];
-        await pcm.ReadAsync(bytes);
-        nint outdata = 0;
-        ulong size = 0;
-        var ret = (SilkEncodeResult)NativeCodec.silk_encode(bytes, (ulong)bytes.Length, ref outdata, ref size,
-            _Fs_API, _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
-        if (ret != SilkEncodeResult.OK && outdata != 0)
-            Marshal.FreeHGlobal(outdata);
-        switch (ret)
-        {
-            case SilkEncodeResult.NULL_INPUT_STREAM:
-            case SilkEncodeResult.INPUT_NOT_FOUND: throw new SilkEncoderException("Input stream is null", ret);
-            case SilkEncodeResult.NULL_OUTPUT_STREAM:
-            case SilkEncodeResult.OUTPUT_NOT_FOUND: throw new SilkEncoderException("Output stream is null", ret);
-            case SilkEncodeResult.CREATE_ECODER_ERROR: throw new SilkEncoderException("Can not create Silk Encoder", ret);
-            case SilkEncodeResult.RESET_ECODER_ERROR: throw new SilkEncoderException("Can not reset Silk Encoder", ret);
-            case SilkEncodeResult.SAMPLE_RATE_OUT_OF_RANGE: throw new SilkEncoderException($"API Sampling rate = {_rate} out of range, valid range 8000 - 48000", ret);
-        }
-        byte[] data = new byte[size];
-        Marshal.Copy(outdata, data, 0, data.Length);
-        Marshal.FreeHGlobal(outdata);
-        return data;
+        return Task.Run(() => Encode(pcm));
     }
 }

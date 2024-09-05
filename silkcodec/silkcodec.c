@@ -43,17 +43,6 @@ void swap_endian(
 #endif
 
 #ifdef _WIN32
-unsigned long GetHighResolutionTime() /* O: time in usec*/
-{
-    /* Returns a time counter in microsec	*/
-    /* the resolution is platform dependent */
-    /* but is typically 1.62 us resolution  */
-    LARGE_INTEGER lpPerformanceCount;
-    LARGE_INTEGER lpFrequency;
-    QueryPerformanceCounter(&lpPerformanceCount);
-    QueryPerformanceFrequency(&lpFrequency);
-    return (unsigned long)((1000000*(lpPerformanceCount.QuadPart)) / lpFrequency.QuadPart);
-}
 /* https://github.com/Arryboom/fmemopen_windows  */
 //fmemeopen
 FILE *fmemopen(void *buf, size_t len, const char *type)
@@ -94,12 +83,7 @@ FILE* open_memstream(char** buf, SKP_uint64* size) {
     return f;
 }
 #else    // Linux or Mac
-unsigned long GetHighResolutionTime() /* O: time in usec*/
-{
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    return((tv.tv_sec*1000000)+(tv.tv_usec));
-}
+
 #endif // _WIN32
 
 /* Seed for the random number generator, which is used for simulating packet loss */
