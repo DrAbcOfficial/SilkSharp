@@ -1,5 +1,9 @@
 # SilkSharp
 
+[![](https://img.shields.io/nuget/v/DrAbc.SilkSharp.svg)](https://www.nuget.org/packages/DrAbc.SilkSharp)
+![NuGet Downloads](https://img.shields.io/nuget/dt/DrAbc.SilkSharp)
+
+
 SilkSharp is a simple binding for silk-codec https://github.com/foyoux/silk-codec
 
 It can convert audio in s16le format to silk v3 format
