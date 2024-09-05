@@ -1,15 +1,23 @@
 # SilkSharp
 
-SilkSharp is a simple binding for silk-codec https://github.com/kn007/silk-v3-decoder
+SilkSharp is a simple binding for silk-codec https://github.com/foyoux/silk-codec
 
 usage:
 
 ```CSharp
-//Stream
-using FileStream fs = File.OpenRead("./rasputin.pcm");
-using MemoryStream ms = new();
-var result = await Codec.SilkEncoderAsync(fs, ms);
-
+//Encoding
+Encoder encoder = new();
 //File
-var result = await Codec.SilkEncoderAsync("./rasputin.pcm", "./rasputin.slk");
+encoder.EncodeAsync("./rasputin.pcm", "./rasputin.silk");
+//Stream
+using FileStream fse = File.OpenRead("./rasputin.pcm");
+using MemoryStream mse = new(await encoder.EncodeAsync(fse));
+
+//Decoding
+Decoder decoder = new();
+//File
+encoder.EncodeAsync("./badmoonrising.silk", "./badmoonrising.pcm");
+//Stream
+using FileStream fsd = File.OpenRead("./badmoonrising.silk");
+using MemoryStream msd = new(await encoder.EncodeAsync(fsd));
 ```

@@ -10,6 +10,7 @@ internal class Program
         Console.WriteLine("Stream Encode");
         using FileStream fse = File.OpenRead("./rasputin.pcm");
         using MemoryStream mse = new(await encoder.EncodeAsync(fse));
+        
         Decoder decoder = new();
         Console.WriteLine("File Decode");
         encoder.EncodeAsync("./badmoonrising.silk", "./badmoonrising.pcm");
