@@ -4,17 +4,17 @@
 ![NuGet Downloads](https://img.shields.io/nuget/dt/DrAbc.SilkSharp)
 
 
-SilkSharp is a simple binding for silk-codec https://github.com/foyoux/silk-codec
+SilkSharp is a simple bundle of silk-codec https://github.com/foyoux/silk-codec
 
-It can convert audio in s16le format to silk v3 format
+It converts audio in s16le format to and from silk v3 format.
 
-Compatible wechat and QQ
+Compatible with WeChat and QQ formats
 
 ---
 
 SilkSharp 是一个 silk-codec https://github.com/foyoux/silk-codec 的简单绑定
 
-它可以将s16le格式的音频转换为silk v3格式
+它实现s16le格式的音频与silk v3格式的相互转换
 
 兼容微信和QQ格式
 
