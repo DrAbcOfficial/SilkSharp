@@ -185,9 +185,9 @@ public class Encoder
     /// <param name="pcmpath">Input PCM sound file path</param>
     /// <param name="slkpath">Output Silk v3 sound file path</param>
     /// <exception cref="SilkEncoderException"></exception>
-    public async Task EncodeAsync(string slkpath, string pcmpath)
+    public async Task EncodeAsync(string pcmpath, string slkpath)
     {
-        await Task.Run(() => Encode(slkpath, pcmpath));
+        await Task.Run(() => Encode(pcmpath, slkpath));
     }
     /// <summary>
     /// Encode PCM sound into Silk v3
