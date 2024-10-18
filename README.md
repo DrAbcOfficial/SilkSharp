@@ -34,7 +34,7 @@ using MemoryStream mse = new(await encoder.EncodeAsync(fse));
 //Decoding
 Decoder decoder = new();
 //File
-encoder.EncodeAsync("./badmoonrising.silk", "./badmoonrising.pcm");
+decoder.DecodeAsync("./badmoonrising.silk", "./badmoonrising.pcm");
 //Stream
 using FileStream fsd = File.OpenRead("./badmoonrising.silk");
 using MemoryStream msd = new(await encoder.EncodeAsync(fsd));
