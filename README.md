@@ -10,6 +10,8 @@ It converts audio in s16le format to and from silk v3 format.
 
 Compatible with WeChat and QQ formats
 
+Currently only `win-x86` `win-x64` `linux-x86` `linux-x64` `linux-arm` `linux-arm64` binary lib are available.
+
 ---
 
 SilkSharp 是一个 silk-codec https://github.com/foyoux/silk-codec 的简单绑定
@@ -18,9 +20,11 @@ SilkSharp 是一个 silk-codec https://github.com/foyoux/silk-codec 的简单绑
 
 兼容微信和QQ格式
 
+目前仅提供`win-x86` `win-x64` `linux-x86` `linux-x64` `linux-arm` `linux-arm64`版本的二进制文件
+
 ---
 
-usage:
+# 😇Usage:
 
 ```CSharp
 //Encoding
@@ -58,3 +62,70 @@ Encoder encoder = new()
 };
 using MemoryStream silk = new(await encoder.EncodeAsync(conversionStream));
 ```
+
+See the SilkSharp.Demo project for more information
+
+更多请参阅SilkSharp.Demo项目
+
+
+# 🏗Build
+
+ 
+If you are using win-arm ,MacOS or other, please build this project from source
+> Not guaranteed it can be compiled on all architectural systems.
+
+## Preparation
+
+1. CMake 3.16 or above
+2. Dotnet 8.0 SDK
+3. git
+
+> C# code may compile on lower versions of dotnet, but I do not guarantee that it will behave like dotnet 8.0.
+
+## Steps
+1. Compile the silkcodec with CMake
+```
+git clone https://github.com/DrAbcOfficial/SilkSharp
+cd SilkSharp
+mkdir build cd build
+cmake ..
+make
+```
+2. Compile SilkSharp using dotnet
+(following the above command)
+```
+cd ../SilkSharp
+dotnet publish -c Release -r osx-arm64
+```
+3. Copy libsilkcodec.so (or silkcodec.dll) and SilkSharp.dll to your project.
+
+---
+
+如果你正在使用win-arm或MacOS或其他架构系统，请自行从源代码构建本项目
+>不保证可在所有架构系统上编译
+
+## 准备
+
+1. CMake 3.16或以上版本
+2. Dotnet 8.0 SDK
+3. git
+
+> C#代码可能可在dotnet更低版本上编译，但我不保证其行为与dotnet 8.0一致
+
+## 步骤
+1. 使用CMake编译silkcodec
+```
+git clone https://github.com/DrAbcOfficial/SilkSharp
+cd SilkSharp
+mkdir build cd build
+cmake ..
+make
+```
+2. 使用dotnet编译SilkSharp
+(接上述命令)
+```
+cd ../SilkSharp
+dotnet publish -c Release -r osx-arm64
+```
+
+3. 将`libsilkcodec.so`（或`silkcodec.dll`/`silkcodec.dylib`）及SilkSharp.dll拷贝至你的项目使用
