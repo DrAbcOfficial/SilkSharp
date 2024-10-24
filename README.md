@@ -86,7 +86,7 @@ If you are using win-arm ,MacOS or other, please build this project from source
 1. Compile the silkcodec with CMake
 ```
 git clone https://github.com/DrAbcOfficial/SilkSharp
-cd SilkSharp
+cd SilkSharp/silkcodec
 mkdir build && cd build
 cmake ..
 make
@@ -116,7 +116,7 @@ dotnet publish -c Release -r osx-arm64
 1. 使用CMake编译silkcodec
 ```
 git clone https://github.com/DrAbcOfficial/SilkSharp
-cd SilkSharp
+cd SilkSharp/silkcodec
 mkdir build && cd build
 cmake ..
 make
