@@ -87,7 +87,7 @@ If you are using win-arm ,MacOS or other, please build this project from source
 ```
 git clone https://github.com/DrAbcOfficial/SilkSharp
 cd SilkSharp
-mkdir build cd build
+mkdir build && cd build
 cmake ..
 make
 ```
@@ -117,7 +117,7 @@ dotnet publish -c Release -r osx-arm64
 ```
 git clone https://github.com/DrAbcOfficial/SilkSharp
 cd SilkSharp
-mkdir build cd build
+mkdir build && cd build
 cmake ..
 make
 ```
