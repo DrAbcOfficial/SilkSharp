@@ -10,7 +10,7 @@ It converts audio in s16le format to and from silk v3 format.
 
 Compatible with WeChat and QQ formats
 
-Currently only `win-x86` `win-x64` `linux-x86` `linux-x64` `linux-arm` `linux-arm64` binary lib are available.
+Currently only `win-x86` `win-x64` `linux-x86` `linux-x64` `linux-arm` `linux-arm64` `osx-arm64` binary lib are available.
 
 ---
 
