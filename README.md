@@ -20,7 +20,7 @@ SilkSharp 是一个 silk-codec https://github.com/foyoux/silk-codec 的简单绑
 
 兼容微信和QQ格式
 
-目前仅提供`win-x86` `win-x64` `linux-x86` `linux-x64` `linux-arm` `linux-arm64`版本的二进制文件
+目前仅提供`win-x86` `win-x64` `linux-x86` `linux-x64` `linux-arm` `linux-arm64` `osx-arm64`版本的二进制文件
 
 ---
 
@@ -71,7 +71,7 @@ See the SilkSharp.Demo project for more information
 # 🏗Build
 
  
-If you are using win-arm ,MacOS or other, please build this project from source
+If you are using win-arm or other system, please build this project from source
 > Not guaranteed it can be compiled on all architectural systems.
 
 ## Preparation
@@ -97,11 +97,11 @@ make
 cd ../SilkSharp
 dotnet publish -c Release -r osx-arm64
 ```
-3. Copy libsilkcodec.so (or silkcodec.dll) and SilkSharp.dll to your project.
+3. Copy libsilkcodec.so (or silkcodec.dll/libsilkcodec.dylib) and SilkSharp.dll to your project.
 
 ---
 
-如果你正在使用win-arm或MacOS或其他架构系统，请自行从源代码构建本项目
+如果你正在使用win-arm或其他架构系统，请自行从源代码构建本项目
 >不保证可在所有架构系统上编译
 
 ## 准备
@@ -128,4 +128,4 @@ cd ../SilkSharp
 dotnet publish -c Release -r osx-arm64
 ```
 
-3. 将`libsilkcodec.so`（或`silkcodec.dll`/`silkcodec.dylib`）及SilkSharp.dll拷贝至你的项目使用
+3. 将`libsilkcodec.so`（或`silkcodec.dll`/`libsilkcodec.dylib`）及SilkSharp.dll拷贝至你的项目使用
