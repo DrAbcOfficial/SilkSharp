@@ -13,7 +13,7 @@
 #ifdef _SYSTEM_IS_BIG_ENDIAN
 /* Function to convert a little endian int16 to a */
 /* big endian int16 or vica verca                 */
-void swap_endian(
+static void swap_endian(
     SKP_int16 vec[],
     SKP_int len)
 {
@@ -34,6 +34,7 @@ void swap_endian(
 
 #if (defined(_WIN32) || defined(_WINCE))
 #include <windows.h>
+#include <io.h>
 #else // Linux or Mac
 
 #endif
@@ -43,7 +44,7 @@ void swap_endian(
 // fmemeopen
 FILE *fmemopen(void *buf, size_t len, const char *type)
 {
-    int fd;
+    int fd = 0;
     FILE *fp;
     char tp[MAX_PATH - 13];
     char fn[MAX_PATH + 1];
@@ -56,7 +57,7 @@ FILE *fmemopen(void *buf, size_t len, const char *type)
         return NULL;
 
     // we dont need so many head... (_O_CREAT | _O_SHORT_LIVED | _O_TEMPORARY | _O_RDWR | _O_BINARY | _O_NOINHERIT, _SH_DENYRW, _S_IREAD | _S_IWRITE) = 0x91D2
-    retner = _sopen_s(pfd, fn, 0x91D2);
+    retner = _sopen_s(pfd, fn, 0x91D2,0x0,0x0);
     if (retner != 0)
         return NULL;
     if (fd == -1)
@@ -72,7 +73,7 @@ FILE *fmemopen(void *buf, size_t len, const char *type)
     rewind(fp);
     return fp;
 }
-FILE *open_memstream(char **buf, SKP_uint64 *size)
+static FILE *open_memstream(char **buf, SKP_uint64 *size)
 {
     FILE *f = tmpfile();
     if (!f)
@@ -89,11 +90,11 @@ FILE *open_memstream(char **buf, SKP_uint64 *size)
 /* Seed for the random number generator, which is used for simulating packet loss */
 static SKP_int32 rand_seed = 1;
 
-SKP_int32 silk_decode_internal(FILE *bitInFile, FILE *speechOutFile, SKP_int32 ar, SKP_float loss)
+static SKP_int32 silk_decode_internal(FILE *bitInFile, FILE *speechOutFile, SKP_int32 ar, SKP_float loss)
 {
     size_t counter;
     SKP_int32 i, k;
-    SKP_int16 ret, len, tot_len;
+    SKP_int16 ret, len, tot_len = 0;
     SKP_int16 nBytes;
     SKP_uint8 payload[DEC_MAX_BYTES_PER_FRAME * DEC_MAX_INPUT_FRAMES * (DEC_MAX_LBRR_DELAY + 1)];
     SKP_uint8 *payloadEnd = NULL, *payloadToDec = NULL;
@@ -239,6 +240,7 @@ SKP_int32 silk_decode_internal(FILE *bitInFile, FILE *speechOutFile, SKP_int32 a
 
         /* Silk decoder */
         outPtr = out;
+        tot_len = 0;
 
         if (lost == 0)
         {
@@ -327,6 +329,7 @@ SKP_int32 silk_decode_internal(FILE *bitInFile, FILE *speechOutFile, SKP_int32 a
 
         /* Silk decoder */
         outPtr = out;
+        tot_len = 0;
 
         if (lost == 0)
         {
@@ -431,11 +434,11 @@ SILK_DLL_EXPORT SKP_int32 silk_decode_file(char *inputfile, char *outputfile, SK
     return ret;
 }
 
-SKP_int32 silk_encode_internal(FILE *speechInFile, FILE *bitOutFile, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
+static SKP_int32 silk_encode_internal(FILE *speechInFile, FILE *bitOutFile, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
                                SKP_int32 intencent, SKP_int32 loss, SKP_int32 dtx, SKP_int32 inbandfec, SKP_int32 Fs_maxInternal)
 {
     size_t counter;
-    SKP_int32 k, ret;
+    SKP_int32 ret;
     SKP_int16 nBytes;
     SKP_uint8 payload[ENC_MAX_BYTES_PER_FRAME * ENC_MAX_INPUT_FRAMES];
     SKP_int16 in[ENC_FRAME_LENGTH_MS * ENC_MAX_API_FS_KHZ * ENC_MAX_INPUT_FRAMES];
