@@ -16,15 +16,15 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cd ${{github.workspace}}/silkcodec && cmake -B ${{github.workspace}}/silkcodec/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cd ${{github.workspace}}/silkcodec/build && cmake .. --config ${{env.BUILD_TYPE}}
 
     - name: Make
-      run: cd ${{github.workspace}}/build && make
+      run: cd ${{github.workspace}}/silkcodec/build && make
     
     - uses: actions/upload-artifact@v4
       with:
         name: libsilkcodec.dylib
-        path: ${{github.workspace}}/build/libsilkcodec.dylib
+        path: ${{github.workspace}}/silkcodec/build/libsilkcodec.dylib
