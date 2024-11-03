@@ -41,7 +41,7 @@ Decoder decoder = new();
 decoder.DecodeAsync("./badmoonrising.silk", "./badmoonrising.pcm");
 //Stream
 using FileStream fsd = File.OpenRead("./badmoonrising.silk");
-using MemoryStream msd = new(await encoder.EncodeAsync(fsd));
+using MemoryStream msd = new(await decoder.DecodeAsync(fsd));
 ```
 
 E.g: Convert other audio to pcm (NAudio)
