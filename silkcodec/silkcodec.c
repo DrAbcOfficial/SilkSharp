@@ -396,28 +396,31 @@ SILK_DLL_EXPORT SKP_int32 silk_decode(char *slk, SKP_uint64 length, char **pcm, 
     FILE *inputstream = fmemopen(slk, length, "rb");
     if (inputstream == NULL)
         return SILK_DEC_NULLINPUTSTREAM;
-    char *outbuf;
+
+    char *membuffer;
     SKP_uint64 size = 0;
-    FILE *outputstream = open_memstream(&outbuf, &size);
+    FILE *outputstream = open_memstream(&membuffer, &size);
     if (outputstream == NULL)
         return SILK_DEC_NULLOUTPUTSTREAM;
+
     int ret = silk_decode_internal(inputstream, outputstream, ar, loss);
 
-#ifdef WIN32
     fseek(outputstream, 0, SEEK_END);
     size = ftell(outputstream);
-    outbuf = (char *)malloc(size + 1);
-    fread(outbuf, 1, size, outputstream);
-#endif
 
-    *pcm = outbuf;
+    char* buffer = (char *)malloc((size + 1) * sizeof(char));
+    fread(buffer, sizeof(char), size, outputstream);
+
+    *pcm = buffer;
     *outlen = size;
+
     /* Close files */
     fclose(outputstream);
     fclose(inputstream);
+    free(membuffer);
     return ret;
 }
-SILK_DLL_EXPORT SKP_int32 silk_decode_file(char *inputfile, char *outputfile, SKP_int32 ar, SKP_float loss)
+SILK_DLL_EXPORT SKP_int32 silk_decode_file(const char *inputfile, const char *outputfile, SKP_int32 ar, SKP_float loss)
 {
     /* Open files */
     FILE *bitInFile = fopen(inputfile, "rb");
@@ -563,7 +566,7 @@ static SKP_int32 silk_encode_internal(FILE *speechInFile, FILE *bitOutFile, SKP_
     return SILK_ENC_OK;
 }
 
-SILK_DLL_EXPORT SKP_int32 silk_encode_file(char *inputfile, char *outputfile, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
+SILK_DLL_EXPORT SKP_int32 silk_encode_file(const char *inputfile, const char *outputfile, SKP_int32 Fs_API, SKP_int32 rate, SKP_int32 packetlength, SKP_int32 complecity,
                                            SKP_int32 intencent, SKP_int32 loss, SKP_int32 dtx, SKP_int32 inbandfec, SKP_int32 Fs_maxInternal)
 {
     /* Open files */
@@ -587,23 +590,35 @@ SILK_DLL_EXPORT SKP_int32 silk_encode(char *pcm, SKP_uint64 length, char **slk, 
     if (speechInFile == NULL)
         return SILK_ENC_NULLINPUTSTREAM;
 
-    char *outbuf;
+    char *membuffer;
     SKP_uint64 size = 0;
-    FILE *bitOutFile = open_memstream(&outbuf, &size);
+    FILE *bitOutFile = open_memstream(&membuffer, &size);
     if (bitOutFile == NULL)
         return SILK_ENC_NULLOUTPUTSTREAM;
+
     int ret = silk_encode_internal(speechInFile, bitOutFile, Fs_API, rate, packetlength, complecity, intencent, loss, dtx, inbandfec, Fs_maxInternal);
 
-#ifdef WIN32
     fseek(bitOutFile, 0, SEEK_END);
     size = ftell(bitOutFile);
-    outbuf = (char *)malloc(size + 1);
-    fread(outbuf, 1, size, bitOutFile);
-#endif
 
-    *slk = outbuf;
+    char* buffer = (char *)malloc((size + 1) * sizeof(char));
+    fread(buffer, sizeof(char), size, bitOutFile);
+
+    *slk = buffer;
     *outlen = size;
+
     fclose(bitOutFile);
     fclose(speechInFile);
+    free(membuffer);
     return ret;
+}
+
+SILK_DLL_EXPORT SKP_int32 silk_free(void* buffer)
+{
+    if( buffer != NULL)
+    {
+        free(buffer);
+        return SILK_FREE_OK;
+    }
+    return SILK_FREE_ERROR;
 }
