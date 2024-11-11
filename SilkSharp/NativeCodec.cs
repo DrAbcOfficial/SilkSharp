@@ -19,4 +19,7 @@ internal static partial class NativeCodec
     internal static partial int silk_encode([In] byte[] pcm, ulong length, ref nint slk, ref ulong outlen, int Fs_API,
         int rate, int packetlength, int complecity,
         int intencent, int loss, int dtx, int inbandfec, int Fs_maxInternal);
+
+    [LibraryImport("silkcodec", StringMarshalling = StringMarshalling.Utf8)]
+    internal static partial int silk_free(nint buffer);
 }

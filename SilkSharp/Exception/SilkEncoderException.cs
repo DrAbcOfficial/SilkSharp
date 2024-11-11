@@ -4,7 +4,7 @@ namespace SilkSharp.SilkException;
 /// </summary>
 /// <param name="msg">Message</param>
 /// <param name="r">Encode result</param>
-public class SilkEncoderException(string msg, Encoder.SilkEncodeResult r) : Exception(msg)
+public class SilkEncoderException(string msg, Encoder.SilkEncodeResult r) : System.Exception(msg)
 {
     /// <summary>
     /// Encode result

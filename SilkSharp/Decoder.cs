@@ -6,7 +6,7 @@ namespace SilkSharp;
 /// <summary>
 /// Silk v3 speech to PCM decoder
 /// </summary>
-public class Decoder
+public class Decoder : BaseCodec
 {
     /// <summary>
     /// Decode result, from native lib
@@ -67,7 +67,7 @@ public class Decoder
         ulong size = 0;
         var ret = (SilkDecodeResult)NativeCodec.silk_decode(ms.ToArray(), (ulong)ms.Length, ref outdata, ref size, _Fs_API, _loss);
         if (ret != SilkDecodeResult.OK && outdata != 0)
-            Marshal.FreeHGlobal(outdata);
+            Free(outdata);
         switch (ret)
         {
             case SilkDecodeResult.NULL_INPUT_STREAM:
@@ -79,7 +79,7 @@ public class Decoder
         }
         byte[] data = new byte[size];
         Marshal.Copy(outdata, data, 0, data.Length);
-        Marshal.FreeHGlobal(outdata);
+        Free(outdata);
         return data;
     }
     /// <summary>

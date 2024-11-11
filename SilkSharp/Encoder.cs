@@ -6,7 +6,7 @@ namespace SilkSharp;
 /// <summary>
 ///  s16le PCM to Silk v3 Encoder
 /// </summary>
-public class Encoder
+public class Encoder : BaseCodec
 {
     /// <summary>
     /// Encode result, from native lib
@@ -162,7 +162,7 @@ public class Encoder
         var ret = (SilkEncodeResult)NativeCodec.silk_encode(bytes, (ulong)bytes.Length, ref outdata, ref size,
             _Fs_API, _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
         if (ret != SilkEncodeResult.OK && outdata != 0)
-            Marshal.FreeHGlobal(outdata);
+            Free(outdata);
         switch (ret)
         {
             case SilkEncodeResult.NULL_INPUT_STREAM:
@@ -175,7 +175,7 @@ public class Encoder
         }
         byte[] data = new byte[size];
         Marshal.Copy(outdata, data, 0, data.Length);
-        Marshal.FreeHGlobal(outdata);
+        Free(outdata);
         return data;
     }
 
