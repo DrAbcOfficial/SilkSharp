@@ -1,0 +1,72 @@
+name: Build Lib
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu, windows, macos]
+    runs-on: ${{ matrix.os }}-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: cd ${{github.workspace}}/silkcodec && cmake -B ${{github.workspace}}/silkcodec/build
+
+    - name: CMake
+      run: cd ${{github.workspace}}/silkcodec/build && cmake ..
+    
+    - name: Make
+      if: matrix.os != 'windows'
+      run: cd ${{github.workspace}}/silkcodec/build && make
+
+    - uses: microsoft/setup-msbuild@v2
+      if: matrix.os == 'windows'
+
+    - name: MSBuild
+      if: matrix.os == 'windows'
+      run: msbuild /m /p:Configuration=Release ${{github.workspace}}/silkcodec/build/silk-codec.sln
+
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v4
+      if: matrix.os == 'ubuntu'
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Dotnet publish
+      if: matrix.os == 'ubuntu'
+      run: cd ${{github.workspace}}/SilkSharp && dotnet publish -c Release
+
+    - uses: actions/upload-artifact@v4
+      if: matrix.os == 'macos'
+      with:
+        name: libsilkcodec.dylib
+        path: ${{github.workspace}}/silkcodec/build/libsilkcodec.dylib
+    
+    - uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu'
+      with:
+        name: libsilkcodec.so
+        path: ${{github.workspace}}/silkcodec/build/libsilkcodec.so
+
+    - name: Upload dotnet lib
+      uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu'
+      with:
+        name: SilkSharp
+        path: |
+          ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.dll
+          ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.xml
+          ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.pdb
+
+    - uses: actions/upload-artifact@v4
+      if: matrix.os == 'windows'
+      with:
+        name: silkcodec.dll
+        path: ${{github.workspace}}/silkcodec/build/Release/silkcodec.dll
