@@ -404,7 +404,11 @@ SILK_DLL_EXPORT SKP_int32 silk_decode(char *slk, SKP_uint64 length, char **pcm, 
     fseek(outputstream, 0, SEEK_END);
     size = ftell(outputstream);
 
-    char* buffer = (char *)malloc((size + 1) * sizeof(char));
+    void* buffer = malloc((size + 1) * sizeof(char));
+    if (buffer == NULL)
+        return SILK_DEC_NULLOUTPUTSTREAM;
+
+    fseek(outputstream, 0, SEEK_SET);
     fread(buffer, sizeof(char), size, outputstream);
 
     *pcm = buffer;
@@ -413,7 +417,8 @@ SILK_DLL_EXPORT SKP_int32 silk_decode(char *slk, SKP_uint64 length, char **pcm, 
     /* Close files */
     fclose(outputstream);
     fclose(inputstream);
-    free(membuffer);
+    if (membuffer != NULL)
+        free(membuffer);
     return ret;
 }
 SILK_DLL_EXPORT SKP_int32 silk_decode_file(const char *inputfile, const char *outputfile, SKP_int32 ar, SKP_float loss)
@@ -597,7 +602,11 @@ SILK_DLL_EXPORT SKP_int32 silk_encode(char *pcm, SKP_uint64 length, char **slk, 
     fseek(bitOutFile, 0, SEEK_END);
     size = ftell(bitOutFile);
 
-    char* buffer = (char *)malloc((size + 1) * sizeof(char));
+    void* buffer = malloc((size + 1) * sizeof(char));
+    if (buffer == NULL)
+        return SILK_DEC_NULLOUTPUTSTREAM;
+
+    fseek(bitOutFile, 0, SEEK_SET);
     fread(buffer, sizeof(char), size, bitOutFile);
 
     *slk = buffer;
@@ -605,7 +614,8 @@ SILK_DLL_EXPORT SKP_int32 silk_encode(char *pcm, SKP_uint64 length, char **slk, 
 
     fclose(bitOutFile);
     fclose(speechInFile);
-    free(membuffer);
+    if(membuffer != NULL)
+        free(membuffer);
     return ret;
 }
 
