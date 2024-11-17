@@ -28,7 +28,7 @@ public class Tests
         bool t = true;
         for (int i = 0; i < pattern.Length; i++)
         {
-            t = t && pattern[i] == pattern[i];
+            t = t && pattern[i] == data[i];
         }
         return t;
     }
