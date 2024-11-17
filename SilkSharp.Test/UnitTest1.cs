@@ -32,6 +32,19 @@ public class Tests
         }
         return t;
     }
+
+    private static string BuildString(string de, string method, int size, int max, byte[] data)
+    {
+        string s = $"{de}({method}) not get properly result. size: {size}({max})\n";
+        s += "Data(16):\n";
+        for (int i = 0; i < Math.Min(16, data.Length); i++)
+        {
+            s += $"0x{ data[i].ToString("X2")} ";
+            if (i % 4 == 0)
+                s += "\n";
+        }
+        return s;
+    }
     [SetUp]
     public void Setup()
     {
@@ -61,8 +74,8 @@ public class Tests
         byte[] result = new byte[test.Length];
         test.Read(result);
         int size = result.Length;
-        Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True,
-            $"Decode(FileSync) not get properly result. size: {size}({_free_decode_size})");
+        Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True, 
+            BuildString("Decode", "FileSync", size, _free_decode_size, result));
     }
     [Test]
     public void DecodeTest_Stream_Sync()
@@ -71,7 +84,7 @@ public class Tests
         byte[] result = decoder.Decode(fs);
         int size = result.Length;
         Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True,
-            $"Decode(StreamSync) not get properly result. size: {size}({_free_decode_size})");
+            BuildString("Decode", "StreamSync", size, _free_decode_size, result));
     }
     [Test]
     public void DecodeTest_File_Async()
@@ -83,7 +96,7 @@ public class Tests
         test.Read(result);
         int size = result.Length;
         Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True,
-            $"Decode(FileAsync) not get properly result. size: {size}({_free_decode_size})");
+            BuildString("Decode", "FileAsync", size, _free_decode_size, result));
     }
     [Test]
     public void DecodeTest_Stream_Async()
@@ -94,7 +107,7 @@ public class Tests
         var result = task.Result;
         int size = result.Length;
         Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True,
-            $"Decode(StreamAsync) not get properly result. size: {size}({_free_decode_size})");
+             BuildString("Decode", "StreamAsync", size, _free_decode_size, result));
     }
     [Test]
     public void EncodeTest_File_Sync()
@@ -105,7 +118,7 @@ public class Tests
         test.Read(result);
         int size = result.Length;
         Assert.That(PatternTest(_push_encode_pattern, result) && size == _push_encode_size, Is.True,
-            $"Encode(FileSync) not get properly result. size: {size}({_push_encode_size})");
+             BuildString("Encode", "FileSync", size, _push_encode_size, result));
     }
     [Test]
     public void EncodeTest_Stream_Sync()
@@ -114,7 +127,7 @@ public class Tests
         byte[] result = encoder.Encode(fs);
         int size = result.Length;
         Assert.That(PatternTest(_push_encode_pattern, result) && size == _push_encode_size, Is.True,
-            $"Encode(StreamSync) not get properly result. size: {size}({_push_encode_size})");
+            BuildString("Encode", "StreamSync", size, _push_encode_size, result));
     }
     [Test]
     public void EncodeTest_File_Async()
@@ -126,7 +139,7 @@ public class Tests
         test.Read(result);
         int size = result.Length;
         Assert.That(PatternTest(_push_encode_pattern, result) && size == _push_encode_size, Is.True,
-            $"Encode(FileAsync) not get properly result. size: {size}({_push_encode_size})");
+            BuildString("Encode", "FileAsync", size, _push_encode_size, result));
     }
     [Test]
     public void EncodeTest_Stream_Async()
@@ -137,6 +150,6 @@ public class Tests
         byte[] result = task.Result;
         int size = result.Length;
         Assert.That(PatternTest(_push_encode_pattern, result) && size == _push_encode_size, Is.True,
-            $"Encode(StreamAsync) not get properly result. size: {size}({_push_encode_size})");
+            BuildString("Encode", "StreamAsync", size, _push_encode_size, result));
     }
 }
