@@ -1,12 +1,13 @@
-﻿using SilkSharp.SilkException;
+﻿using SilkSharp.Audio;
+using SilkSharp.SilkException;
 using System.Runtime.InteropServices;
 
-namespace SilkSharp;
+namespace SilkSharp.Codec;
 
 /// <summary>
 ///  s16le PCM to Silk v3 Encoder
 /// </summary>
-public class Encoder : BaseCodec
+public class SilkEncoder : BaseCodec
 {
     /// <summary>
     /// Encode result, from native lib
@@ -46,24 +47,7 @@ public class Encoder : BaseCodec
         /// </summary>
         NULL_OUTPUT_STREAM
     }
-    /// <summary>
-    /// Silk file complecity
-    /// </summary>
-    public enum SilkComplecity
-    {
-        /// <summary>
-        /// Low quality, min size
-        /// </summary>
-        Low = 0,
-        /// <summary>
-        /// Medium quality, ave size
-        /// </summary>
-        Medium = 1,
-        /// <summary>
-        /// High quality, large size
-        /// </summary>
-        High = 2
-    }
+
 
     /// <summary>
     /// API sampling rate in Hz, default: 24000
@@ -146,20 +130,16 @@ public class Encoder : BaseCodec
     /// <summary>
     /// Encode PCM sound into Silk v3
     /// </summary>
-    /// <param name="pcm">Input PCM sound stream</param>
-    /// <returns>Silk v3 file data</returns>
+    /// <param name="input">PCM data</param>
+    /// <returns>Silk v3 audio</returns>
     /// <exception cref="SilkEncoderException"></exception>
-    public byte[] Encode(Stream pcm)
+    public SilkAudio Encode(byte[] input)
     {
-        if (pcm == null || !pcm.CanRead)
-            throw new SilkEncoderException("Input stream is null or not readable", SilkEncodeResult.NULL_INPUT_STREAM);
-        byte[] bytes = new byte[pcm.Length];
-        int bytesRead = pcm.Read(bytes);
-        if (bytesRead != bytes.Length)
-            throw new SilkEncoderException("Failed to read the entire stream", SilkEncodeResult.NULL_INPUT_STREAM);
+        if (input.Length <= 0)
+            throw new SilkEncoderException("Input data is null", SilkEncodeResult.NULL_INPUT_STREAM);
         nint outdata = 0;
         ulong size = 0;
-        var ret = (SilkEncodeResult)NativeCodec.silk_encode(bytes, (ulong)bytes.Length, ref outdata, ref size,
+        var ret = (SilkEncodeResult)NativeCodec.silk_encode(input, (ulong)input.Length, ref outdata, ref size,
             _Fs_API, _rate, _packetlength, _complecity, _intencent, _loss, _dtx, _inbandfec, _Fs_maxInternal);
         if (ret != SilkEncodeResult.OK && outdata != 0)
             Free(outdata);
@@ -176,7 +156,33 @@ public class Encoder : BaseCodec
         byte[] data = new byte[size];
         Marshal.Copy(outdata, data, 0, data.Length);
         Free(outdata);
-        return data;
+        var silk = new SilkAudio(data)
+        {
+            BandFEC = BandFEC,
+            Complecity = Complecity,
+            DTX = DTX,
+            Loss = Loss,
+            PacketLength = PacketLength,
+            Rate = Rate,
+            Tencent = Tencent,
+        };
+        return silk;
+    }
+    /// <summary>
+    /// Encode PCM sound into Silk v3
+    /// </summary>
+    /// <param name="pcm">Input PCM sound stream</param>
+    /// <returns>Silk v3 audio</returns>
+    /// <exception cref="SilkEncoderException"></exception>
+    public SilkAudio Encode(Stream pcm)
+    {
+        if (pcm == null || !pcm.CanRead)
+            throw new SilkEncoderException("Input stream is null or not readable", SilkEncodeResult.NULL_INPUT_STREAM);
+        byte[] bytes = new byte[pcm.Length];
+        int bytesRead = pcm.Read(bytes);
+        if (bytesRead != bytes.Length)
+            throw new SilkEncoderException("Failed to read the entire stream", SilkEncodeResult.NULL_INPUT_STREAM);
+        return Encode(bytes);
     }
 
     /// <summary>
@@ -205,8 +211,17 @@ public class Encoder : BaseCodec
     /// <param name="pcm">Input PCM sound stream</param>
     /// <returns>Silk v3 file data</returns>
     /// <exception cref="SilkEncoderException"></exception>
-    public Task<byte[]> EncodeAsync(Stream pcm)
+    public Task<SilkAudio> EncodeAsync(Stream pcm)
     {
         return Task.Run(() => Encode(pcm));
+    }
+    /// <summary>
+    /// Encode PCM sound into Silk v3
+    /// </summary>
+    /// <param name="data">Input PCM sound data</param>
+    /// <returns>Silk v3 file data</returns>
+    public Task<SilkAudio> EncodeAsync(byte[] data)
+    {
+        return Task.Run(() => Encode(data));
     }
 }

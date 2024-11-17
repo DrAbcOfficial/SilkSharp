@@ -1,12 +1,13 @@
-﻿using SilkSharp.SilkException;
+﻿using SilkSharp.Audio;
+using SilkSharp.SilkException;
 using System.Runtime.InteropServices;
 
-namespace SilkSharp;
+namespace SilkSharp.Codec;
 
 /// <summary>
 /// Silk v3 speech to PCM decoder
 /// </summary>
-public class Decoder : BaseCodec
+public class SilkDecoder : BaseCodec
 {
     /// <summary>
     /// Decode result, from native lib
@@ -53,19 +54,18 @@ public class Decoder : BaseCodec
 
     private int _Fs_API = 24000;
     private float _loss = 0.0f;
+
     /// <summary>
     /// Decode Silk v3 speech into PCM
     /// </summary>
-    /// <param name="silkStream">Silk v3 stream</param>
-    /// <returns>PCM data</returns>
+    /// <param name="input">Silk v3 data</param>
+    /// <returns>PCM</returns>
     /// <exception cref="SilkDecoderException"></exception>
-    public byte[] Decode(Stream silkStream)
+    public S16LEAudio Decode(byte[] input)
     {
-        using MemoryStream ms = new();
-        silkStream.CopyTo(ms);
         nint outdata = 0;
         ulong size = 0;
-        var ret = (SilkDecodeResult)NativeCodec.silk_decode(ms.ToArray(), (ulong)ms.Length, ref outdata, ref size, _Fs_API, _loss);
+        var ret = (SilkDecodeResult)NativeCodec.silk_decode(input, (ulong)input.Length, ref outdata, ref size, _Fs_API, _loss);
         if (ret != SilkDecodeResult.OK && outdata != 0)
             Free(outdata);
         switch (ret)
@@ -80,7 +80,24 @@ public class Decoder : BaseCodec
         byte[] data = new byte[size];
         Marshal.Copy(outdata, data, 0, data.Length);
         Free(outdata);
-        return data;
+        var s16le = new S16LEAudio(data)
+        {
+            Rate = FS_API,
+            Loss = (int)Loss,
+        };
+        return s16le;
+    }
+    /// <summary>
+    /// Decode Silk v3 speech into PCM
+    /// </summary>
+    /// <param name="silkStream">Silk v3 stream</param>
+    /// <returns>PCM</returns>
+    /// <exception cref="SilkDecoderException"></exception>
+    public S16LEAudio Decode(Stream silkStream)
+    {
+        using MemoryStream ms = new();
+        silkStream.CopyTo(ms);
+        return Decode(ms.ToArray());
     }
     /// <summary>
     /// Decode Silk v3 speech into PCM
@@ -117,9 +134,18 @@ public class Decoder : BaseCodec
     /// <param name="silkStream">Silk v3 stream</param>
     /// <returns>PCM data</returns>
     /// <exception cref="SilkDecoderException"></exception>
-    public async Task<byte[]> DecodeAsync(Stream silkStream)
+    public async Task<S16LEAudio> DecodeAsync(Stream silkStream)
     {
         return await Task.Run(() => Decode(silkStream));
+    }
+    /// <summary>
+    /// Decode Silk v3 speech into PCM
+    /// </summary>
+    /// <param name="silk">Silk v3 data</param>
+    /// <returns>PCM data</returns>
+    public async Task<S16LEAudio> DecodeAsync(byte[] silk)
+    {
+        return await Task.Run(() => Decode(silk));
     }
     /// <summary>
     /// Decode Silk v3 speech into PCM

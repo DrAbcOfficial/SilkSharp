@@ -1,9 +1,11 @@
+using SilkSharp.Codec;
+
 namespace SilkSharp.Test;
 
 public class Tests
 {
-    private Decoder decoder;
-    private Encoder encoder;
+    private SilkDecoder decoder;
+    private SilkEncoder encoder;
 
     private readonly byte[] _free_decode_pattern = [
             0x00, 0x00, 0x00, 0x00,
@@ -53,12 +55,12 @@ public class Tests
         bool b = File.Exists("assets/push.pcm");
         Assert.That(a && b, Is.True, "Test assets are not exist!");
 
-        decoder = new Decoder()
+        decoder = new SilkDecoder()
         {
             FS_API = 24000,
             Loss = 0
         };
-        encoder = new Encoder()
+        encoder = new SilkEncoder()
         {
             FS_API = 24000,
             FS_MaxInternal = 24000,
@@ -83,10 +85,10 @@ public class Tests
     public void DecodeTest_Stream_Sync()
     {
         using var fs = File.OpenRead("assets/free.silk");
-        byte[] result = decoder.Decode(fs);
-        int size = result.Length;
-        Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True,
-            BuildString("Decode", "StreamSync", size, _free_decode_size, result));
+        var result = decoder.Decode(fs);
+        int size = result.Data.Length;
+        Assert.That(PatternTest(_free_decode_pattern, result.Data) && size == _free_decode_size, Is.True,
+            BuildString("Decode", "StreamSync", size, _free_decode_size, result.Data));
     }
     [Test]
     public void DecodeTest_File_Async()
@@ -107,9 +109,9 @@ public class Tests
         var task = decoder.DecodeAsync(fs);
         task.Wait();
         var result = task.Result;
-        int size = result.Length;
-        Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True,
-             BuildString("Decode", "StreamAsync", size, _free_decode_size, result));
+        int size = result.Data.Length;
+        Assert.That(PatternTest(_free_decode_pattern, result.Data) && size == _free_decode_size, Is.True,
+             BuildString("Decode", "StreamAsync", size, _free_decode_size, result.Data));
     }
     [Test]
     public void EncodeTest_File_Sync()
@@ -126,10 +128,10 @@ public class Tests
     public void EncodeTest_Stream_Sync()
     {
         using var fs = File.OpenRead("assets/push.pcm");
-        byte[] result = encoder.Encode(fs);
-        int size = result.Length;
-        Assert.That(PatternTest(_push_encode_pattern, result) && size == _push_encode_size, Is.True,
-            BuildString("Encode", "StreamSync", size, _push_encode_size, result));
+        var result = encoder.Encode(fs);
+        int size = result.Data.Length;
+        Assert.That(PatternTest(_push_encode_pattern, result.Data) && size == _push_encode_size, Is.True,
+            BuildString("Encode", "StreamSync", size, _push_encode_size, result.Data));
     }
     [Test]
     public void EncodeTest_File_Async()
@@ -149,9 +151,39 @@ public class Tests
         using var fs = File.OpenRead("assets/push.pcm");
         var task = encoder.EncodeAsync(fs);
         task.Wait();
-        byte[] result = task.Result;
-        int size = result.Length;
-        Assert.That(PatternTest(_push_encode_pattern, result) && size == _push_encode_size, Is.True,
-            BuildString("Encode", "StreamAsync", size, _push_encode_size, result));
+        var result = task.Result;
+        int size = result.Data.Length;
+        Assert.That(PatternTest(_push_encode_pattern, result.Data) && size == _push_encode_size, Is.True,
+            BuildString("Encode", "StreamAsync", size, _push_encode_size, result.Data));
+    }
+
+    const long _encode_time = 15140;
+    [Test]
+    public void SilkAudio_Format()
+    {
+        using var fs = File.OpenRead("assets/push.pcm");
+        var result = encoder.Encode(fs);
+        long time = result.GetDuration();
+        Assert.That(time, Is.EqualTo(_encode_time), $"Silk audio format GetDuration() with error! {time}({_encode_time})");
+
+        var pcm = result.GetS16LE();
+        long ptime = pcm.GetDuration();
+        Assert.That(time, Is.EqualTo(_encode_time), $"Silk audio format GetS16LE() with error! {time}({_encode_time})");
+        Assert.That(time, Is.EqualTo(ptime), $"Silk S16LE audio format duration not equal! {time}-{ptime}");
+    }
+
+    const long _decode_time = 6560;
+    [Test]
+    public void S16LEAudio_Format()
+    {
+        using var fs = File.OpenRead("assets/free.silk");
+        var result = decoder.Decode(fs);
+        long time = result.GetDuration();
+        Assert.That(time, Is.EqualTo(_decode_time), $"S16LE audio format GetDuration() with error! {time}({_decode_time})");
+
+        var silk = result.GetSilk(true);
+        long stime = silk.GetDuration();
+        Assert.That(time, Is.EqualTo(_decode_time), $"S16LE audio format GetSilk() with error! {time}({_decode_time})");
+        Assert.That(time, Is.EqualTo(stime), $"S16LE Silk audio format duration not equal! {time}-{stime}");
     }
 }

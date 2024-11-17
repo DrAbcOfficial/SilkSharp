@@ -35,7 +35,7 @@ search nuget package: DrAbc.SilkSharp
 
 ```CSharp
 //Encoding
-Encoder encoder = new();
+SilkEncoder encoder = new();
 //File
 encoder.EncodeAsync("./rasputin.pcm", "./rasputin.silk");
 //Stream
@@ -43,7 +43,7 @@ using FileStream fse = File.OpenRead("./rasputin.pcm");
 using MemoryStream mse = new(await encoder.EncodeAsync(fse));
 
 //Decoding
-Decoder decoder = new();
+SilkDecoder decoder = new();
 //File
 decoder.DecodeAsync("./badmoonrising.silk", "./badmoonrising.pcm");
 //Stream
@@ -59,7 +59,7 @@ using NAudio.Wave;
 using Mp3FileReader reader = new("input.mp3");
 WaveFormat pcmFormat = new(16000, 16, 1);
 using WaveFormatConversionStream conversionStream = new(pcmFormat, reader);
-Encoder encoder = new()
+SilkEncoder encoder = new()
 {
     //Same with your music
     Rate = 16000,

@@ -1,4 +1,6 @@
-﻿namespace SilkSharp.Exception;
+﻿using SilkSharp.Codec;
+
+namespace SilkSharp.Exception;
 /// <summary>
 /// Silk Mem Free Exception
 /// </summary>

@@ -1,6 +1,6 @@
 ﻿using SilkSharp.Exception;
 
-namespace SilkSharp;
+namespace SilkSharp.Codec;
 
 /// <summary>
 /// Basic class, do not use directly
@@ -26,7 +26,7 @@ public abstract class BaseCodec
     /// </summary>
     /// <param name="buffer">unmanaged memory pointer</param>
     /// <exception cref="SilkMemFreeException">Free failed</exception>
-    protected void Free(nint buffer)
+    protected static void Free(nint buffer)
     {
         SilkFreeResult ret = (SilkFreeResult)NativeCodec.silk_free(buffer);
         switch (ret)
