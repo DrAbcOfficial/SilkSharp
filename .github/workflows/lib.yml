@@ -119,8 +119,15 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
+    - name: Download linux artifacts
+      uses: actions/download-artifact@v4
+      with: 
+        name: linux
     - name: Build Test Unit
       run: cd ${{github.workspace}}/SilkSharp.Test && dotnet build
+    - name: Move native lib
+      run:
+        mv x64.so ${{github.workspace}}/SilkSharp.Test/bin/Debug/net8.0/libsilkcodec.so
     - name: Test
       run: cd ${{github.workspace}}/SilkSharp.Test && dotnet test
 
@@ -138,6 +145,7 @@ jobs:
 
       - name: Move all artifacts
         run: |
+          mkdir nuget
           cp -r win/ nuget/win/
           cp -r linux/ nuget/linux/
           cp -r osx/ nuget/osx/
