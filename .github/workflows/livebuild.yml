@@ -145,13 +145,18 @@ jobs:
 
       - name: Move all artifacts
         run: |
-          mkdir nuget
-          cp -r win/ nuget/win/
-          cp -r linux/ nuget/linux/
-          cp -r osx/ nuget/osx/
-          cp -r SilkSharp/ nuget/SilkSharp/
+          cp -r win/ nuget/win/ &&
+          cp -r linux/ nuget/linux/ &&
+          cp -r osx/ nuget/osx/ &&
+          cp -r SilkSharp/ nuget/dotnet/ &&
           cp README.md nuget/README.md
 
       - name: Pack in
         run: |
-          echo "Not done yet"
+          dotnet pack ${{github.workspace}}/SilkSharp/SilkSharp.csproj --no-build --no-dependencies --no-restore -o ${{github.workspace}}/nuget -p:NuspecFile=${{github.workspace}}/nuget/SilkSharp.nuspec -p:NuspecBasePath=${{github.workspace}}/nuget/
+      
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: nugetpack
+          path: ${{github.workspace}}/nuget/*.nupkg
