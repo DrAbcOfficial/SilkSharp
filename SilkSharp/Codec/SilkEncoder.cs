@@ -10,46 +10,6 @@ namespace SilkSharp.Codec;
 public class SilkEncoder : BaseCodec
 {
     /// <summary>
-    /// Encode result, from native lib
-    /// </summary>
-    public enum SilkEncodeResult
-    {
-        /// <summary>
-        /// OK
-        /// </summary>
-        OK = 0,
-        /// <summary>
-        /// Can not found input file
-        /// </summary>
-        INPUT_NOT_FOUND,
-        /// <summary>
-        /// Can not found output file
-        /// </summary>
-        OUTPUT_NOT_FOUND,
-        /// <summary>
-        /// Can not create encoder
-        /// </summary>
-        CREATE_ECODER_ERROR,
-        /// <summary>
-        /// Can not init encoder
-        /// </summary>
-        RESET_ECODER_ERROR,
-        /// <summary>
-        /// FS_API sampling out of range, valid range 8000 - 48000
-        /// </summary>
-        SAMPLE_RATE_OUT_OF_RANGE,
-        /// <summary>
-        /// Input stream is null
-        /// </summary>
-        NULL_INPUT_STREAM,
-        /// <summary>
-        /// Output stream is null
-        /// </summary>
-        NULL_OUTPUT_STREAM
-    }
-
-
-    /// <summary>
     /// API sampling rate in Hz, default: 24000
     /// </summary>
     public int FS_API { get => _Fs_API; set => _Fs_API = value; }

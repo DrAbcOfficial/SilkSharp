@@ -8,20 +8,6 @@ namespace SilkSharp.Codec;
 public abstract class BaseCodec
 {
     /// <summary>
-    /// Memfree code
-    /// </summary>
-    public enum SilkFreeResult
-    {
-        /// <summary>
-        /// OK
-        /// </summary>
-        OK = 0,
-        /// <summary>
-        /// Error
-        /// </summary>
-        ERROR = 1,
-    }
-    /// <summary>
     /// Free unmanaged memory
     /// </summary>
     /// <param name="buffer">unmanaged memory pointer</param>

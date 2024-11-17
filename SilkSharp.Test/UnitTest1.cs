@@ -42,8 +42,8 @@ public class Tests
         s += "Data(16):\n";
         for (int i = 0; i < Math.Min(16, data.Length); i++)
         {
-            s += $"0x{ data[i].ToString("X2")} ";
-            if (i % 4 == 0)
+            s += string.Format("0x{0:X2} ", data[i]);
+            if ((i + 1) % 4 == 0)
                 s += "\n";
         }
         return s;
@@ -78,7 +78,7 @@ public class Tests
         byte[] result = new byte[test.Length];
         test.Read(result);
         int size = result.Length;
-        Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True, 
+        Assert.That(PatternTest(_free_decode_pattern, result) && size == _free_decode_size, Is.True,
             BuildString("Decode", "FileSync", size, _free_decode_size, result));
     }
     [Test]

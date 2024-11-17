@@ -10,40 +10,6 @@ namespace SilkSharp.Codec;
 public class SilkDecoder : BaseCodec
 {
     /// <summary>
-    /// Decode result, from native lib
-    /// </summary>
-    public enum SilkDecodeResult
-    {
-        /// <summary>
-        /// OK
-        /// </summary>
-        OK = 0,
-        /// <summary>
-        /// Can not found input file
-        /// </summary>
-        INPUT_NOT_FOUND,
-        /// <summary>
-        /// Header is not valid silk v3 file
-        /// </summary>
-        WRONG_HEADER,
-        /// <summary>
-        /// Cant not found output file
-        /// </summary>
-        OUTPUT_NOT_FOUND,
-        /// <summary>
-        /// Decoded with error
-        /// </summary>
-        DECODE_ERROR,
-        /// <summary>
-        /// Input stream is null
-        /// </summary>
-        NULL_INPUT_STREAM,
-        /// <summary>
-        /// Output stream is null
-        /// </summary>
-        NULL_OUTPUT_STREAM
-    }
-    /// <summary>
     /// Sampling rate of output signal in Hz; default: 24000
     /// </summary>
     public int FS_API { get => _Fs_API; set => _Fs_API = value; }
