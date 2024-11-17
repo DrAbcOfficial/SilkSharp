@@ -7,66 +7,128 @@ on:
     branches: [ "main" ]
     
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu, windows, macos]
-    runs-on: ${{ matrix.os }}-latest
-
+  build_linux:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
     - name: Configure CMake
       run: cd ${{github.workspace}}/silkcodec && cmake -B ${{github.workspace}}/silkcodec/build
-
-    - name: CMake
+    - name: CMake x64
       run: cd ${{github.workspace}}/silkcodec/build && cmake ..
-    
     - name: Make
-      if: matrix.os != 'windows'
       run: cd ${{github.workspace}}/silkcodec/build && make
-
-    - uses: microsoft/setup-msbuild@v2
-      if: matrix.os == 'windows'
-
-    - name: MSBuild
-      if: matrix.os == 'windows'
-      run: msbuild /m /p:Configuration=Release ${{github.workspace}}/silkcodec/build/silk-codec.sln
-
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
-      if: matrix.os == 'ubuntu'
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Dotnet publish
-      if: matrix.os == 'ubuntu'
-      run: cd ${{github.workspace}}/SilkSharp && dotnet publish -c Release
-
+    - name: Move x64
+      run: mv ${{github.workspace}}/silkcodec/build/libsilkcodec.so ${{github.workspace}}/silkcodec/x64.so
+    - name: Clean up CMake
+      run: rm -r ${{github.workspace}}/silkcodec/build/*
+    - name: CMake x86
+      run: sudo dpkg --add-architecture i386 && sudo apt install gcc-multilib g++-multilib && cd ${{github.workspace}}/silkcodec/build && cmake -DCMAKE_C_FLAGS=-m32 ..
+    - name: Make x86
+      run: cd ${{github.workspace}}/silkcodec/build && make
+    - name: Move x86
+      run: mv ${{github.workspace}}/silkcodec/build/libsilkcodec.so ${{github.workspace}}/silkcodec/x86.so
+    - name: Clean up CMake
+      run: rm -r ${{github.workspace}}/silkcodec/build/* && sudo apt install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
+    - name: Make arm64
+      run: cd ${{github.workspace}}/silkcodec/build && cmake -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc .. && make && mv ${{github.workspace}}/silkcodec/build/libsilkcodec.so ${{github.workspace}}/silkcodec/arm64.so
+    - name: Clean up CMake
+      run: rm -r ${{github.workspace}}/silkcodec/build/*
+    - name: Make arm
+      run: cd ${{github.workspace}}/silkcodec/build && cmake -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc .. && make && mv ${{github.workspace}}/silkcodec/build/libsilkcodec.so ${{github.workspace}}/silkcodec/arm.so
     - uses: actions/upload-artifact@v4
-      if: matrix.os == 'macos'
       with:
-        name: libsilkcodec.dylib
-        path: ${{github.workspace}}/silkcodec/build/libsilkcodec.dylib
-    
-    - uses: actions/upload-artifact@v4
-      if: matrix.os == 'ubuntu'
-      with:
-        name: libsilkcodec.so
-        path: ${{github.workspace}}/silkcodec/build/libsilkcodec.so
-
-    - name: Upload dotnet lib
-      uses: actions/upload-artifact@v4
-      if: matrix.os == 'ubuntu'
-      with:
-        name: SilkSharp
+        name: linux
         path: |
-          ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.dll
-          ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.xml
-          ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.pdb
-
+          ${{github.workspace}}/silkcodec/x86.so
+          ${{github.workspace}}/silkcodec/x64.so
+          ${{github.workspace}}/silkcodec/arm.so
+          ${{github.workspace}}/silkcodec/arm64.so
+  build_windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: microsoft/setup-msbuild@v2
+    - name: Configure CMake
+      run: cd ${{github.workspace}}/silkcodec && cmake -B ${{github.workspace}}/silkcodec/build
+    - name: CMake x64
+      run: cd ${{github.workspace}}/silkcodec/build && cmake ..
+    - name: MSBuild x64
+      run: msbuild /m /p:Configuration=Release ${{github.workspace}}/silkcodec/build/silk-codec.sln
+    - name: Move x64
+      run: mv ${{github.workspace}}/silkcodec/build/Release/silkcodec.dll ${{github.workspace}}/silkcodec/x64.dll
+    - name: Clean up CMake
+      run: rm -r ${{github.workspace}}/silkcodec/build/*
+    - name: CMake x86
+      run: cd ${{github.workspace}}/silkcodec/build && cmake -A Win32 ..
+    - name: MSBuild x86
+      run: msbuild /m /p:Configuration=Release ${{github.workspace}}/silkcodec/build/silk-codec.sln
+    - name: Move x86
+      run: mv ${{github.workspace}}/silkcodec/build/Release/silkcodec.dll ${{github.workspace}}/silkcodec/x86.dll
     - uses: actions/upload-artifact@v4
-      if: matrix.os == 'windows'
       with:
-        name: silkcodec.dll
-        path: ${{github.workspace}}/silkcodec/build/Release/silkcodec.dll
+        name: win
+        path: |
+          ${{github.workspace}}/silkcodec/x86.dll
+          ${{github.workspace}}/silkcodec/x64.dll
+  build_macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Configure CMake
+      run: cd ${{github.workspace}}/silkcodec && cmake -B ${{github.workspace}}/silkcodec/build
+    - name: CMake x64
+      run: cd ${{github.workspace}}/silkcodec/build && cmake ..
+    - name: Make
+      run: cd ${{github.workspace}}/silkcodec/build && make
+    - name: Move
+      run: mv ${{github.workspace}}/silkcodec/build/libsilkcodec.dylib ${{github.workspace}}/silkcodec/arm64.dylib
+    - uses: actions/upload-artifact@v4
+      with:
+        name: osx
+        path: ${{github.workspace}}/silkcodec/arm64.dylib
+  build_dotnetlib:
+    runs-on: ubuntu-latest
+    needs: [build_linux, build_windows, build_macos]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+  
+      - name: Publish dotnet lib
+        run: cd ${{github.workspace}}/SilkSharp && dotnet publish -c Release
+      
+      - name: Upload dotnet lib
+        uses: actions/upload-artifact@v4
+        with:
+          name: SilkSharp
+          path: |
+            ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.dll
+            ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.xml
+            ${{github.workspace}}/SilkSharp/bin/Release/net8.0/publish/SilkSharp.pdb
+
+  create_nugetpack:
+    needs: [build_dotnetlib]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Move all artifacts
+        run: |
+          cp -r win/ nuget/win/
+          cp -r linux/ nuget/linux/
+          cp -r osx/ nuget/osx/
+          cp -r SilkSharp/ nuget/SilkSharp/
+          cp README.md nuget/README.md
+
+      - name: Pack in
+        run: |
+          echo "Not done yet"
