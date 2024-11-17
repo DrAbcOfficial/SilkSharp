@@ -16,10 +16,10 @@ public class Tests
     private readonly byte[] _push_encode_pattern = [
             0x02, 0x23, 0x21, 0x53,
             0x49, 0x4C, 0x4B, 0x5F,
-            0x56, 0x33, 0x18, 0x00,
-            0xE9, 0xBC, 0xEE, 0xD5
+            0x56, 0x33, 0x0B, 0x00,
+            0xA7, 0x2B, 0x74, 0xF7
         ];
-    private readonly int _push_encode_size = 45884;
+    private readonly int _push_encode_size = 41533;
 
     private static bool PatternTest(byte[] pattern, byte[] data)
     {
@@ -62,6 +62,7 @@ public class Tests
         {
             FS_API = 24000,
             FS_MaxInternal = 24000,
+            Rate = 24000,
             Loss = 0,
             Tencent = true
         };
