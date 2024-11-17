@@ -34,7 +34,6 @@ public class Tests
         }
         return t;
     }
-
     private static string BuildString(string de, string method, int size, int max, byte[] data)
     {
         string s = $"{de}({method}) not get properly result. size: {size}({max})\n";
