@@ -160,3 +160,12 @@ jobs:
         with:
           name: nugetpack
           path: ${{github.workspace}}/nuget/*.nupkg
+      
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            SilkSharp
+            linux
+            win
+            osx
