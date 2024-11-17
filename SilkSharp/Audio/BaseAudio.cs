@@ -74,7 +74,7 @@ public abstract class BaseAudio
     public abstract long GetDuration();
 
     /// <summary>
-    /// implicit cast
+    /// implicit cast into byte[]
     /// </summary>
     /// <param name="d">base audio</param>
     public static implicit operator byte[](BaseAudio d) => d._data;
