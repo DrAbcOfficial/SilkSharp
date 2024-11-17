@@ -1,6 +1,6 @@
 using SilkSharp.Codec;
 
-namespace SilkSharp.SilkException;
+namespace SilkSharp.Exception;
 /// <summary>
 /// Silk Decoder Exception
 /// </summary>

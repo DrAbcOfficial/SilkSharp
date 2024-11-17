@@ -1,5 +1,5 @@
 ﻿using SilkSharp.Audio;
-using SilkSharp.SilkException;
+using SilkSharp.Exception;
 using System.Runtime.InteropServices;
 
 namespace SilkSharp.Codec;
