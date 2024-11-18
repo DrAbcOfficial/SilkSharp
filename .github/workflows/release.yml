@@ -9,6 +9,24 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+
+      - name: Build player
+        run: |
+          cd ${{github.workspace}}/SilkSharp/SilkSharp.SilkPlayer && dotnet publish
+      
+      - name: Zipping All
+        uses: vimtor/action-zip@v1
+        with:
+            files: ${{github.workspace}}/bin/Release/net8.0/publish
+            dest: SilkPlayer.zip
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            SilkPlayer.zip
