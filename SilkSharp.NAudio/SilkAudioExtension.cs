@@ -15,19 +15,10 @@ public static class SilkAudioExtension
     /// <returns></returns>
     public static RawSourceWaveStream GetRawStream(this SilkAudio silk)
     {
-        using var ms = new MemoryStream(silk.GetS16LE().Data);
+        var ms = new MemoryStream(silk.GetS16LE().Data);
         WaveFormat wave = new(silk.Rate, 16, 1);
         var rawStream = new RawSourceWaveStream(ms, wave);
         return rawStream;
-    }
-    /// <summary>
-    /// Get Wave steram
-    /// </summary>
-    /// <param name="silk">pcm</param>
-    /// <returns>wave</returns>
-    public static Stream GetWave(this SilkAudio silk)
-    {
-        return GetRawStream(silk);
     }
     /// <summary>
     /// Get Mp3 stream
@@ -38,7 +29,7 @@ public static class SilkAudioExtension
     {
         using var rawStream = GetRawStream(silk);
         var stream = new MemoryStream();
-        MediaFoundationEncoder.EncodeToMp3(rawStream, stream);
+        MediaFoundationEncoder.EncodeToMp3(rawStream, stream, silk.Rate);
         return stream;
     }
     /// <summary>
@@ -50,19 +41,7 @@ public static class SilkAudioExtension
     {
         using var rawStream = GetRawStream(silk);
         var stream = new MemoryStream();
-        MediaFoundationEncoder.EncodeToAac(rawStream, stream);
+        MediaFoundationEncoder.EncodeToAac(rawStream, stream, silk.Rate);
         return stream;
-    }
-    /// <summary>
-    /// Get WaveOutEvent
-    /// </summary>
-    /// <param name="silk">pcm</param>
-    /// <returns>waveout</returns>
-    public static WaveOutEvent GetWaveOutEvent(this SilkAudio silk)
-    {
-        using var rawStream = GetRawStream(silk);
-        var waveout = new WaveOutEvent();
-        waveout.Init(rawStream);
-        return waveout;
     }
 }
