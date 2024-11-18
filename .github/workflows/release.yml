@@ -21,7 +21,7 @@ jobs:
       - name: Zipping All
         uses: vimtor/action-zip@v1
         with:
-            files: ${{github.workspace}}/SilkSharp.SilkPlayer/bin/Release/net8.0/publish
+            files: ${{github.workspace}}/SilkSharp.SilkPlayer/bin/Release/net8.0/publish/*
             dest: SilkPlayer.zip
 
       - name: Create Release
