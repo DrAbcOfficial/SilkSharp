@@ -56,7 +56,7 @@ public static class SilkAudioExtension
     /// <summary>
     /// Get WaveOutEvent
     /// </summary>
-    /// <param name="s16le">pcm</param>
+    /// <param name="silk">pcm</param>
     /// <returns>waveout</returns>
     public static WaveOutEvent GetWaveOutEvent(this SilkAudio silk)
     {
