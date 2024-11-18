@@ -15,11 +15,8 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1" />
+    <PackageReference Include="DrAbc.SilkSharp" Version="2.0.8" />
+    <PackageReference Include="DrAbc.SilkSharp.NAudio" Version="1.0.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SilkSharp.NAudio\SilkSharp.NAudio.csproj" />
-    <ProjectReference Include="..\SilkSharp\SilkSharp.csproj" />
   </ItemGroup>
 </Project>
