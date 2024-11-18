@@ -3,6 +3,9 @@ using SilkSharp.Audio;
 
 namespace SilkSharp.NAudio;
 
+/// <summary>
+/// SilkAudio class extension
+/// </summary>
 public static class SilkAudioExtension
 {
     /// <summary>
