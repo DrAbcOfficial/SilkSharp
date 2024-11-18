@@ -19,9 +19,9 @@ jobs:
           cd ${{github.workspace}}/SilkSharp.SilkPlayer && dotnet publish
       
       - name: Zipping All
-        uses: vimtor/action-zip@v1
+        uses: vimtor/action-zip@v1.2
         with:
-            files: ${{github.workspace}}/SilkSharp.SilkPlayer/bin/Release/net8.0/publish/*
+            files: SilkSharp.SilkPlayer/bin/Release/net8.0/publish/
             dest: SilkPlayer.zip
 
       - name: Create Release
