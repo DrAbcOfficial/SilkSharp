@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DrAbc.SilkSharp.NAudio</id>
+    <version>1.0.0-livebuild</version>
+    <authors>Dr.Abc</authors>
+    <owners>Dr.Abc</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>silk v3 codec binding, support WeChat and QQ</description>
+    <tags>native dll silk audio format C# Skype WeChat QQ Tencent NAudio</tags>
+    <dependencies>
+      <group targetFramework=".NET8.0"> 
+		<dependency id="DrAbc.SilkSharp" version="2.0.8" />
+		<dependency id="NAudio" version="2.2.1" />
+      </group>
+    </dependencies>
+     <repository type="git" url="https://github.com/DrAbcOfficial/SilkSharp.git" branch="main" />
+     <license type="expression">GPL-3.0-or-later</license>
+  </metadata>
+  <files>
+    <file src="../SilkSharp.NAudio/bin/Release/net8.0/SilkSharp.NAudio.dll" target="lib/net8.0/SilkSharp.NAudio.dll" />
+    <file src="../SilkSharp.NAudio/bin/Release/net8.0/SilkSharp.NAudio.xml" target="lib/net8.0/SilkSharp.NAudio.xml" />
+    <file src="../SilkSharp.NAudio/bin/Release/net8.0/SilkSharp.NAudio.pdb" target="lib/net8.0/SilkSharp.NAudio.pdb" />
+  </files>
+</package>

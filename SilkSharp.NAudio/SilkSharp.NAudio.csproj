@@ -4,15 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <IncludeSymbols>True</IncludeSymbols>
-    <PackageTags>NAudio Silk Audio</PackageTags>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/DrAbcOfficial/SilkSharp</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/DrAbcOfficial/SilkSharp</PackageProjectUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IncludeSymbols>False</IncludeSymbols>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

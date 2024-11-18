@@ -155,6 +155,12 @@ jobs:
         run: |
           dotnet pack ${{github.workspace}}/SilkSharp/SilkSharp.csproj -o ${{github.workspace}}/nuget -p:NuspecFile=${{github.workspace}}/nuget/SilkSharp.nuspec -p:NuspecBasePath=${{github.workspace}}/nuget/
       
+
+      - name: Pack NAudio
+        run: |
+          dotnet build ${{github.workspace}}/SilkSharp.NAudio/SilkSharp.NAudio.csproj --configuration Release &&
+          dotnet pack ${{github.workspace}}/SilkSharp.NAudio/SilkSharp.NAudio.csproj -o ${{github.workspace}}/nuget -p:NuspecFile=${{github.workspace}}/nuget/NAudio.nuspec -p:NuspecBasePath=${{github.workspace}}/nuget/
+      
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
