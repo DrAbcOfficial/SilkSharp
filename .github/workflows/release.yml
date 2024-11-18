@@ -4,29 +4,41 @@ on:
     tags:
     - '*.*.*'
 jobs:
-  create_relese:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  build_player:
+    strategy:
+      matrix:
+        os: [ubuntu, windows]
+    runs-on: ${{ matrix.os }}-latest 
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
-
       - name: Build player
         run: |
           cd ${{github.workspace}}/SilkSharp.SilkPlayer && dotnet publish
-      
       - name: Zipping All
         uses: vimtor/action-zip@v1.2
         with:
             files: SilkSharp.SilkPlayer/bin/Release/net8.0/publish/
-            dest: SilkPlayer.zip
-
+            dest: SilkPlayer-${{matrix.os}}-x64.zip
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{matrix.os}}
+          path: SilkPlayer-${{matrix.os}}-x64.zip
+    
+  create_relese:
+    needs: [build_player]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            SilkPlayer.zip
+            ubuntu/SilkPlayer-ubuntu-x64.zip
+            windows/SilkPlayer-windows-x64.zip
