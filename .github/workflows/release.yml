@@ -16,12 +16,12 @@ jobs:
 
       - name: Build player
         run: |
-          cd ${{github.workspace}}/SilkSharp/SilkSharp.SilkPlayer && dotnet publish
+          cd ${{github.workspace}}/SilkSharp.SilkPlayer && dotnet publish
       
       - name: Zipping All
         uses: vimtor/action-zip@v1
         with:
-            files: ${{github.workspace}}/bin/Release/net8.0/publish
+            files: ${{github.workspace}}/SilkSharp.SilkPlayer/bin/Release/net8.0/publish
             dest: SilkPlayer.zip
 
       - name: Create Release
