@@ -1,8 +1,9 @@
 # SilkSharp
 
-[![](https://img.shields.io/nuget/v/DrAbc.SilkSharp.svg)](https://www.nuget.org/packages/DrAbc.SilkSharp)
-![NuGet Downloads](https://img.shields.io/nuget/dt/DrAbc.SilkSharp)
-
+[![](https://img.shields.io/nuget/v/DrAbc.SilkSharp.svg?label=SilkSharp&logo=NuGet)](https://www.nuget.org/packages/DrAbc.SilkSharp)
+![NuGet Downloads](https://img.shields.io/nuget/dt/DrAbc.SilkSharp?label=Downloads)
+[![](https://img.shields.io/nuget/v/DrAbc.SilkSharp.NAudio.svg?label=SilkSharp.NAudio&logo=NuGet)](https://www.nuget.org/packages/DrAbc.SilkSharp.NAudio)
+![NuGet Downloads](https://img.shields.io/nuget/dt/DrAbc.SilkSharp.NAudio?label=Downloads)
 
 SilkSharp is a simple bundle of silk-codec https://github.com/foyoux/silk-codec
 
