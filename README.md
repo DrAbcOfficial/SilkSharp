@@ -54,20 +54,14 @@ using MemoryStream msd = new(await decoder.DecodeAsync(fsd));
 E.g: Convert other audio to pcm (NAudio)
 
 ```CSharp
-using NAudio.Wave;
+using SilkSharp.Codec;
+using SilkSharp.NAudio;
 
-using Mp3FileReader reader = new("input.mp3");
-WaveFormat pcmFormat = new(16000, 16, 1);
-using WaveFormatConversionStream conversionStream = new(pcmFormat, reader);
-SilkEncoder encoder = new()
-{
-    //Same with your music
-    Rate = 16000,
-    FS_API = 16000,
-    //QQ and Wechat Compatibility
-    Tencent = true
-};
-using MemoryStream silk = new(await encoder.EncodeAsync(conversionStream));
+var silk_1 = new SilkAudio("./badmoonrising.silk", 16000, 0);
+var mp3  = silk_1.GetMp3();
+
+var pcm = new S16LEAudio("./rasputin.pcm", 16000, 0);
+var silk_2 = pcm.GetSilk(false);
 ```
 
 See the SilkSharp.Demo project for more information

@@ -1,4 +1,6 @@
-﻿using SilkSharp.Codec;
+﻿using SilkSharp.Audio;
+using SilkSharp.Codec;
+using SilkSharp.NAudio;
 
 /* Init a encoder 
 初始化一个编码器 */
@@ -49,3 +51,12 @@ fod.Wait();
 /* Read async result as a stream
    将异步结果读取为流 */
 using MemoryStream msd = new(fod.Result.Data);
+
+/* Read/Write mp3 using NAudio *
+ * 使用NAudio读写Mp3 */
+
+var silk_1 = new SilkAudio("./badmoonrising.silk", 16000, 0);
+var mp3  = silk_1.GetMp3();
+
+var pcm = new S16LEAudio("./rasputin.pcm", 16000, 0);
+var silk_2 = pcm.GetSilk(false);

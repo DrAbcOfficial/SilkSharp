@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SilkSharp.NAudio\SilkSharp.NAudio.csproj" />
     <ProjectReference Include="..\SilkSharp\SilkSharp.csproj" />
   </ItemGroup>
 
