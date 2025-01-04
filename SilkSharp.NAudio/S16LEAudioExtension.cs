@@ -20,6 +20,17 @@ public static class S16LEAudioExtension
         var rawStream = new RawSourceWaveStream(ms, wave);
         return rawStream;
     }
+
+    /// <summary>
+    /// Get raw stream async
+    /// </summary>
+    /// <param name="s16le"></param>
+    /// <returns></returns>
+    public static async Task<RawSourceWaveStream> GetRawStreamAsync(this S16LEAudio s16le)
+    {
+        return await Task.Run(() => GetRawStream(s16le));
+    }
+
     /// <summary>
     /// Get Mp3 stream
     /// </summary>
@@ -32,6 +43,17 @@ public static class S16LEAudioExtension
         MediaFoundationEncoder.EncodeToMp3(rawStream, stream, s16le.Rate);
         return stream;
     }
+
+    /// <summary>
+    /// Get Mp3 stream
+    /// </summary>
+    /// <param name="s16le">pcm</param>
+    /// <returns>mp3</returns>
+    public static async Task<Stream> GetMp3Async(this S16LEAudio s16le)
+    {
+        return await Task.Run(() => GetMp3(s16le));
+    }
+
     /// <summary>
     /// Get Aac stream
     /// </summary>
@@ -43,5 +65,15 @@ public static class S16LEAudioExtension
         var stream = new MemoryStream();
         MediaFoundationEncoder.EncodeToAac(rawStream, stream, s16le.Rate);
         return stream;
+    }
+
+    /// <summary>
+    /// Get Aac stream
+    /// </summary>
+    /// <param name="s16le">pcm</param>
+    /// <returns>aac</returns>
+    public static async Task<Stream> GetAacAsync(this S16LEAudio s16le)
+    {
+        return await Task.Run(() => GetAac(s16le));
     }
 }

@@ -21,6 +21,15 @@ public static class SilkAudioExtension
         return rawStream;
     }
     /// <summary>
+    /// Get raw stream async
+    /// </summary>
+    /// <param name="silk"></param>
+    /// <returns></returns>
+    public static async Task<RawSourceWaveStream> GetRawStreamAsync(this SilkAudio silk)
+    {
+        return await Task.Run(() => GetRawStream(silk));
+    }
+    /// <summary>
     /// Get Mp3 stream
     /// </summary>
     /// <param name="silk">pcm</param>
@@ -33,6 +42,15 @@ public static class SilkAudioExtension
         return stream;
     }
     /// <summary>
+    /// Get Mp3 stream
+    /// </summary>
+    /// <param name="silk">pcm</param>
+    /// <returns>mp3</returns>
+    public static async Task<Stream> GetMp3Async(this SilkAudio silk)
+    {
+        return await Task.Run(() => GetMp3(silk));
+    }
+    /// <summary>
     /// Get Aac stream
     /// </summary>
     /// <param name="silk">pcm</param>
@@ -43,5 +61,14 @@ public static class SilkAudioExtension
         var stream = new MemoryStream();
         MediaFoundationEncoder.EncodeToAac(rawStream, stream, silk.Rate);
         return stream;
+    }
+    /// <summary>
+    /// Get Aac stream
+    /// </summary>
+    /// <param name="silk">pcm</param>
+    /// <returns>aac</returns>
+    public static async Task<Stream> GetAacAsync(this SilkAudio silk)
+    {
+        return await Task.Run(() => GetAac(silk));
     }
 }
