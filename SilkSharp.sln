@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SilkSharp.Demo", "SilkSharp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SilkSharp.Test", "SilkSharp.Test\SilkSharp.Test.csproj", "{E263FEDA-DC4A-4A0A-A7C3-612E78074642}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkSharp.NAudio", "SilkSharp.NAudio\SilkSharp.NAudio.csproj", "{AB15DA3A-B80F-4132-BFE3-347B2609C0BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SilkSharp.NAudio", "SilkSharp.NAudio\SilkSharp.NAudio.csproj", "{AB15DA3A-B80F-4132-BFE3-347B2609C0BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkSharp.SilkPlayer", "SilkSharp.SilkPlayer\SilkSharp.SilkPlayer.csproj", "{4FDE974D-2E1A-4942-AAC6-EBEEE5536A19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{AB15DA3A-B80F-4132-BFE3-347B2609C0BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB15DA3A-B80F-4132-BFE3-347B2609C0BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB15DA3A-B80F-4132-BFE3-347B2609C0BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FDE974D-2E1A-4942-AAC6-EBEEE5536A19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FDE974D-2E1A-4942-AAC6-EBEEE5536A19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FDE974D-2E1A-4942-AAC6-EBEEE5536A19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FDE974D-2E1A-4942-AAC6-EBEEE5536A19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

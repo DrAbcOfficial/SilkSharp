@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DrAbc.SilkSharp</id>
-    <version>2.0.8-livebuild</version>
+    <version>2.0.8</version>
     <authors>Dr.Abc</authors>
     <owners>Dr.Abc</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>

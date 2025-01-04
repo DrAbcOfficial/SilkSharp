@@ -138,6 +138,7 @@ public class SilkEncoder : BaseCodec
     {
         if (pcm == null || !pcm.CanRead)
             throw new SilkEncoderException("Input stream is null or not readable", SilkEncodeResult.NULL_INPUT_STREAM);
+        pcm.Seek(0, SeekOrigin.Begin);
         byte[] bytes = new byte[pcm.Length];
         int bytesRead = pcm.Read(bytes);
         if (bytesRead != bytes.Length)

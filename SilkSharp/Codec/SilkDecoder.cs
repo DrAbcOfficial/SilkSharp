@@ -61,6 +61,7 @@ public class SilkDecoder : BaseCodec
     /// <exception cref="SilkDecoderException"></exception>
     public S16LEAudio Decode(Stream silkStream)
     {
+        silkStream.Seek(0, SeekOrigin.Begin);
         using MemoryStream ms = new();
         silkStream.CopyTo(ms);
         return Decode(ms.ToArray());

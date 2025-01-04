@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DrAbc.SilkSharp.NAudio</id>
-    <version>1.0.0-livebuild</version>
+    <version>1.0.0</version>
     <authors>Dr.Abc</authors>
     <owners>Dr.Abc</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
