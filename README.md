@@ -1,3 +1,5 @@
+obsoleted, use pure C# version: https://github.com/DrAbcOfficial/SilkCodec.NET
+
 # SilkSharp
 
 [![](https://img.shields.io/nuget/v/DrAbc.SilkSharp.svg?label=SilkSharp&logo=NuGet)](https://www.nuget.org/packages/DrAbc.SilkSharp)
